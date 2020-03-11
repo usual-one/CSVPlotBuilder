@@ -11,9 +11,7 @@
 #define ERROR_DISPLAYING_TIMEOUT 1000
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
-{
+        : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
     setlocale(LC_ALL, "C");
 
@@ -27,7 +25,8 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::setPath() {
-    QString file_path = QFileDialog::getOpenFileName(this, "../lw-2/resource", "../lw-2/resource", tr("CSV tables (*.csv)"));
+    QString file_path = QFileDialog::getOpenFileName(this, "../lw-2/resource", "../lw-2/resource",
+                                                     tr("CSV tables (*.csv)"));
     ui->ln_path->setText(file_path);
 }
 
@@ -57,8 +56,8 @@ void MainWindow::showRegionFields() {
         return;
     }
 
-    vector<string> headers = response.headers;
-    vector<vector<string>> fields = response.arr;
+    vector <string> headers = response.headers;
+    vector <vector<string>> fields = response.arr;
 
 
     QStringList horizontal_headers;
@@ -77,8 +76,7 @@ void MainWindow::showRegionFields() {
     ui->tbl_found->setModel(model);
 }
 
-void MainWindow::showCalculationResults()
-{
+void MainWindow::showCalculationResults() {
     op_args request_args = {};
     request_args.column = ui->ln_column->text().toStdString();
     request_args.operation_type = CALCULATE_METRICS;
@@ -89,7 +87,6 @@ void MainWindow::showCalculationResults()
     model->setItem(1, 0, new QStandardItem("Maximum"));
     model->setItem(2, 0, new QStandardItem("Median"));
 
-    request_args.metrics_type = MIN;
     res_t response = exec_op(request_args);
     if (response.error_type == DATA_NOT_FOUND) {
         ui->statusBar->showMessage("Data is not loaded", ERROR_DISPLAYING_TIMEOUT);
@@ -103,11 +100,13 @@ void MainWindow::showCalculationResults()
         ui->statusBar->showMessage("Invalid column values", ERROR_DISPLAYING_TIMEOUT);
         return;
     }
-    model->setItem(0, 1, new QStandardItem(QString::number(exec_op(request_args).metric)));
-    request_args.metrics_type = MAX;
-    model->setItem(1, 1, new QStandardItem(QString::number(exec_op(request_args).metric)));
-    request_args.metrics_type = MEDIAN;
-    model->setItem(2, 1, new QStandardItem(QString::number(exec_op(request_args).metric)));
+    if (response.error_type == COLUMN_IS_EMPTY) {
+        ui->statusBar->showMessage("Column is empty", ERROR_DISPLAYING_TIMEOUT);
+        return;
+    }
+    model->setItem(0, 1, new QStandardItem(QString::number(response.metrics.at(0))));
+    model->setItem(1, 1, new QStandardItem(QString::number(response.metrics.at(1))));
+    model->setItem(2, 1, new QStandardItem(QString::number(response.metrics.at(2))));
 
     ui->tbl_res->setModel(model);
 }

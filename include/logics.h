@@ -40,23 +40,22 @@ typedef struct {
     string region;
     pair<int, int> years;
     string column;
-    metrics_t metrics_type;
 } op_args;
 
 typedef struct {
     err_t error_type;
-    vector<vector<string>> arr;
-    vector<string> headers;
-    double metric;
+    vector <vector<string>> arr;
+    vector <string> headers;
+    vector <double> metrics;
 } res_t;
 
 res_t exec_op(op_args args);
 
-tuple<err_t, vector<string>, vector<vector<string>>> readCSV(const string &path, const string &region, pair<int, int> years);
+tuple <err_t, vector<string>, vector<vector<string>>> readCSV(const string &path, const string &region, pair<int, int> years);
 
-vector<string> splitStr(const string &str, const string &sep);
+vector <string> splitStr(const string &str, const string &sep);
 
-tuple<err_t, double> getMetrics(const string &column, metrics_t type);
+tuple <err_t, double> getMetrics(const string &column, metrics_t type);
 
 double getMinimum(const vector<double> &arr);
 
