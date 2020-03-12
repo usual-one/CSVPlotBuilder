@@ -21,9 +21,11 @@ public:
 private slots:
     void setPath();
 
-    void showRegionFields();
+    void showFields();
 
     void showCalculationResults();
+
+    void addRegion();
 
 private:
     Ui::MainWindow *ui;

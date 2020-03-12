@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+#include "include/graphics/mainwindow.h"
 #include "ui_mainwindow.h"
 
 #include <QFileDialog>
@@ -6,9 +6,9 @@
 
 #include <QDebug>
 
-#include "include/logics.h"
+#include "include/logics/logics.h"
 
-#define ERROR_DISPLAYING_TIMEOUT 1000
+#define ERROR_DISPLAYING_TIMEOUT 2000
 
 MainWindow::MainWindow(QWidget *parent)
         : QMainWindow(parent), ui(new Ui::MainWindow) {
@@ -16,8 +16,9 @@ MainWindow::MainWindow(QWidget *parent)
     setlocale(LC_ALL, "C");
 
     connect(ui->btn_browse, SIGNAL(clicked()), this, SLOT(setPath()));
-    connect(ui->btn_load, SIGNAL(clicked()), this, SLOT(showRegionFields()));
+    connect(ui->btn_load, SIGNAL(clicked()), this, SLOT(showFields()));
     connect(ui->btn_calculate, SIGNAL(clicked()), this, SLOT(showCalculationResults()));
+    connect(ui->btn_add, SIGNAL(clicked()), this, SLOT(addRegion()));
 }
 
 MainWindow::~MainWindow() {
@@ -31,7 +32,7 @@ void MainWindow::setPath() {
 }
 
 
-void MainWindow::showRegionFields() {
+void MainWindow::showFields() {
     op_args request_args = {};
     request_args.path = ui->ln_path->text().toStdString();
     request_args.region = ui->ln_region->text().toStdString();
@@ -74,6 +75,11 @@ void MainWindow::showRegionFields() {
     }
 
     ui->tbl_found->setModel(model);
+
+    if (ui->ln_region->text().size()) {
+        ui->lst_regions->clear();
+        ui->lst_regions->addItem(ui->ln_region->text());
+    }
 }
 
 void MainWindow::showCalculationResults() {
@@ -109,4 +115,22 @@ void MainWindow::showCalculationResults() {
     model->setItem(2, 1, new QStandardItem(QString::number(response.metrics.at(2))));
 
     ui->tbl_res->setModel(model);
+}
+
+void MainWindow::addRegion()
+{
+    QString region = ui->ln_add_region->text();
+    ui->ln_add_region->clear();
+
+    if (!ui->lst_regions->count()) {
+        ui->statusBar->showMessage("Main region is not selected", ERROR_DISPLAYING_TIMEOUT);
+        return;
+    }
+
+    if (ui->lst_regions->findItems(region, Qt::MatchExactly).size()) {
+        ui->statusBar->showMessage("Such region has been already added", ERROR_DISPLAYING_TIMEOUT);
+        return;
+    }
+
+    ui->lst_regions->addItem(region);
 }

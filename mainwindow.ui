@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1160</width>
-    <height>597</height>
+    <width>1400</width>
+    <height>700</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -44,7 +44,7 @@
    <property name="styleSheet">
     <string notr="true"/>
    </property>
-   <layout class="QHBoxLayout" name="horizontalLayout_2">
+   <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,0,0">
     <property name="spacing">
      <number>5</number>
     </property>
@@ -105,13 +105,13 @@
           </property>
           <property name="minimumSize">
            <size>
-            <width>90</width>
+            <width>80</width>
             <height>30</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>90</width>
+            <width>80</width>
             <height>30</height>
            </size>
           </property>
@@ -137,7 +137,7 @@
          <widget class="QLineEdit" name="ln_region">
           <property name="minimumSize">
            <size>
-            <width>100</width>
+            <width>150</width>
             <height>30</height>
            </size>
           </property>
@@ -160,15 +160,21 @@
         </item>
         <item>
          <widget class="QLineEdit" name="ln_init_year">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="minimumSize">
            <size>
-            <width>0</width>
+            <width>60</width>
             <height>30</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>16777215</width>
+            <width>60</width>
             <height>30</height>
            </size>
           </property>
@@ -216,15 +222,21 @@
         </item>
         <item>
          <widget class="QLineEdit" name="ln_final_year">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="minimumSize">
            <size>
-            <width>0</width>
+            <width>60</width>
             <height>30</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>16777215</width>
+            <width>60</width>
             <height>30</height>
            </size>
           </property>
@@ -249,13 +261,13 @@
           </property>
           <property name="minimumSize">
            <size>
-            <width>90</width>
+            <width>80</width>
             <height>30</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>90</width>
+            <width>80</width>
             <height>30</height>
            </size>
           </property>
@@ -315,11 +327,20 @@
           <property name="spacing">
            <number>2</number>
           </property>
+          <property name="sizeConstraint">
+           <enum>QLayout::SetDefaultConstraint</enum>
+          </property>
           <item>
            <widget class="QLineEdit" name="ln_column">
             <property name="minimumSize">
              <size>
-              <width>0</width>
+              <width>150</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
               <height>30</height>
              </size>
             </property>
@@ -340,21 +361,21 @@
           <item>
            <widget class="QPushButton" name="btn_calculate">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
             <property name="minimumSize">
              <size>
-              <width>130</width>
+              <width>150</width>
               <height>30</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>200</width>
-              <height>100</height>
+              <width>150</width>
+              <height>30</height>
              </size>
             </property>
             <property name="font">
@@ -363,6 +384,9 @@
               <pointsize>11</pointsize>
              </font>
             </property>
+            <property name="layoutDirection">
+             <enum>Qt::LeftToRight</enum>
+            </property>
             <property name="text">
              <string>Calculate and draw</string>
             </property>
@@ -370,6 +394,12 @@
           </item>
           <item>
            <widget class="QTableView" name="tbl_res">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>16777215</height>
+             </size>
+            </property>
             <property name="font">
              <font>
               <family>Ubuntu</family>
@@ -406,7 +436,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QListWidget" name="lst">
+       <widget class="QListWidget" name="lst_regions">
         <property name="font">
          <font>
           <family>Ubuntu</family>
@@ -418,7 +448,7 @@
      </layout>
     </item>
     <item>
-     <layout class="QVBoxLayout" name="layout_plot">
+     <layout class="QVBoxLayout" name="layout_plot" stretch="0,1">
       <property name="spacing">
        <number>2</number>
       </property>
@@ -429,6 +459,24 @@
         </property>
         <item>
          <widget class="QLineEdit" name="ln_add_region">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>150</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>30</height>
+           </size>
+          </property>
           <property name="font">
            <font>
             <family>Ubuntu</family>
@@ -441,7 +489,25 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton">
+         <widget class="QPushButton" name="btn_add">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>40</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>40</width>
+            <height>30</height>
+           </size>
+          </property>
           <property name="font">
            <font>
             <family>Ubuntu</family>
@@ -456,7 +522,7 @@
        </layout>
       </item>
       <item>
-       <widget class="QWidget" name="wdg_plot" native="true">
+       <widget class="QCustomPlot" name="wdg_plot" native="true">
         <property name="font">
          <font>
           <family>Ubuntu</family>
@@ -478,6 +544,14 @@
    </property>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QCustomPlot</class>
+   <extends>QWidget</extends>
+   <header>lib/qcustomplot.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

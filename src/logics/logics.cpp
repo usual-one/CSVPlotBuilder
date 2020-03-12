@@ -1,4 +1,4 @@
-#include "../include/logics.h"
+#include "../../include/logics/logics.h"
 
 #include <cstdlib>
 
