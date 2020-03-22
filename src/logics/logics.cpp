@@ -1,6 +1,9 @@
 #include "../../include/logics/logics.h"
 
 #include <cstdlib>
+#include <fstream>
+#include <utility>
+#include <tuple>
 
 vector <string> HEADERS = {};
 vector <vector<string>> FIELDS = {};
@@ -9,7 +12,7 @@ res_t exec_op(op_args args) {
     res_t results = {};
     switch (args.operation_type) {
         case LOAD_DATA: {
-            auto csv = readCSV(args.path, args.region, args.years);
+            auto csv = readCSV(args.path, args.regions.at(0), args.years);
             results.error_type = get<0>(csv);
             HEADERS = results.headers = get<1>(csv);
             FIELDS = results.arr = get<2>(csv);

@@ -44,7 +44,7 @@
    <property name="styleSheet">
     <string notr="true"/>
    </property>
-   <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,0,0">
+   <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,1,2">
     <property name="spacing">
      <number>5</number>
     </property>

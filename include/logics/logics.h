@@ -1,13 +1,8 @@
 #ifndef LOGICS_H
 #define LOGICS_H
 
-#include <QDebug>
-
-#include <fstream>
-#include <string>
 #include <vector>
-#include <utility>
-#include <tuple>
+#include <string>
 
 using namespace std;
 
@@ -37,16 +32,19 @@ enum err_t {
 typedef struct {
     op_t operation_type;
     string path;
-    string region;
-    pair<int, int> years;
+    vector <string> regions;
+    pair <int, int> years;
     string column;
 } op_args;
 
 typedef struct {
     err_t error_type;
-    vector <vector<string>> arr;
+    vector <vector <string>> arr;
     vector <string> headers;
-    vector <double> metrics;
+    vector <vector <double>> metrics;
+    // [[metric1, metric2, ...], ...]
+    vector <vector <vector <double>>> col_values;
+    // [[[years], [values]], ...]
 } res_t;
 
 res_t exec_op(op_args args);

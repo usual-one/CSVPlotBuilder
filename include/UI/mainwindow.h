@@ -1,6 +1,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "include/logics/logics.h"
+
 #include <QMainWindow>
 
 #include <string>
@@ -23,11 +25,15 @@ private slots:
 
     void showFields();
 
-    void showCalculationResults();
+    void showResults();
 
     void addRegion();
 
 private:
+    void showMetrics(res_t loaded_data);
+
+    void showPlot(res_t loaded_data);
+
     Ui::MainWindow *ui;
 };
 #endif // MAINWINDOW_H

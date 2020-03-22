@@ -1,4 +1,4 @@
-#include "include/graphics/mainwindow.h"
+#include "include/UI/mainwindow.h"
 #include "ui_mainwindow.h"
 
 #include <QFileDialog>
@@ -17,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->btn_browse, SIGNAL(clicked()), this, SLOT(setPath()));
     connect(ui->btn_load, SIGNAL(clicked()), this, SLOT(showFields()));
-    connect(ui->btn_calculate, SIGNAL(clicked()), this, SLOT(showCalculationResults()));
+    connect(ui->btn_calculate, SIGNAL(clicked()), this, SLOT(showResults()));
     connect(ui->btn_add, SIGNAL(clicked()), this, SLOT(addRegion()));
 }
 
@@ -35,7 +35,7 @@ void MainWindow::setPath() {
 void MainWindow::showFields() {
     op_args request_args = {};
     request_args.path = ui->ln_path->text().toStdString();
-    request_args.region = ui->ln_region->text().toStdString();
+    request_args.regions.push_back(ui->ln_region->text().toStdString());
     request_args.years = {ui->ln_init_year->text().toInt(), ui->ln_final_year->text().toInt()};
     request_args.operation_type = LOAD_DATA;
     res_t response = exec_op(request_args);
@@ -82,18 +82,18 @@ void MainWindow::showFields() {
     }
 }
 
-void MainWindow::showCalculationResults() {
+void MainWindow::showResults() {
     op_args request_args = {};
     request_args.column = ui->ln_column->text().toStdString();
     request_args.operation_type = CALCULATE_METRICS;
 
-    QStandardItemModel *model = new QStandardItemModel;
-    model->setHorizontalHeaderLabels({"Metric", "Value"});
-    model->setItem(0, 0, new QStandardItem("Minimum"));
-    model->setItem(1, 0, new QStandardItem("Maximum"));
-    model->setItem(2, 0, new QStandardItem("Median"));
+    QList<QListWidgetItem*> items = ui->lst_regions->findItems(QString("*"), Qt::MatchWrap | Qt::MatchWildcard);
+    for (auto item : items) {
+        request_args.regions.push_back(item->text().toStdString());
+    }
 
     res_t response = exec_op(request_args);
+
     if (response.error_type == DATA_NOT_FOUND) {
         ui->statusBar->showMessage("Data is not loaded", ERROR_DISPLAYING_TIMEOUT);
         return;
@@ -110,11 +110,28 @@ void MainWindow::showCalculationResults() {
         ui->statusBar->showMessage("Column is empty", ERROR_DISPLAYING_TIMEOUT);
         return;
     }
-    model->setItem(0, 1, new QStandardItem(QString::number(response.metrics.at(0))));
-    model->setItem(1, 1, new QStandardItem(QString::number(response.metrics.at(1))));
-    model->setItem(2, 1, new QStandardItem(QString::number(response.metrics.at(2))));
+
+    showMetrics(response);
+    showPlot(response);
+}
+
+void MainWindow::showMetrics(res_t loaded_data) {
+    QStandardItemModel *model = new QStandardItemModel;
+    model->setHorizontalHeaderLabels({"Metric", "Value"});
+    model->setItem(0, 0, new QStandardItem("Minimum"));
+    model->setItem(1, 0, new QStandardItem("Maximum"));
+    model->setItem(2, 0, new QStandardItem("Median"));
+
+    model->setItem(0, 1, new QStandardItem(QString::number(loaded_data.metrics.at(0))));
+    model->setItem(1, 1, new QStandardItem(QString::number(loaded_data.metrics.at(1))));
+    model->setItem(2, 1, new QStandardItem(QString::number(loaded_data.metrics.at(2))));
 
     ui->tbl_res->setModel(model);
+}
+
+void MainWindow::showPlot(res_t loaded_data)
+{
+
 }
 
 void MainWindow::addRegion()
