@@ -3,7 +3,6 @@
 
 #include <fstream>
 #include <utility>
-#include <tuple>
 #include <algorithm>
 
 vector <string> HEADERS = {};
@@ -11,36 +10,30 @@ vector <vector<string>> FIELDS = {};
 
 res_t exec_op(op_args args) {
     res_t results = {};
-    switch (args.operation_type) {
-        case LOAD_DATA: {
-            auto csv = readCSV(args.path, args.regions.at(0), args.years);
-            results.error_type = csv.first;
-            HEADERS = results.headers = csv.second.first;
-            FIELDS = results.arr = csv.second.second;
-            break;
+    if (args.operation_type == LOAD_DATA) {
+        auto csv = readCSV(args.path, args.regions.at(0), args.years);
+        results.error_type = csv.first;
+        HEADERS = results.headers = csv.second.first;
+        FIELDS = results.arr = csv.second.second;
+    } else if (args.operation_type == CALCULATE_METRICS) {
+        auto regions_data_response = getRegionsData(args.path, args.regions, args.years);
+        if (regions_data_response.first) {
+            results.error_type = regions_data_response.first;
+            return results;
         }
-        case CALCULATE_METRICS: {
-            auto regions_data_response = getRegionsData(args.path, args.regions, args.years);
-            if (regions_data_response.first) {
-                results.error_type = regions_data_response.first;
-                return results;
-            }
-            auto col_values_response = getColValues(args.regions, args.column);
-            if (col_values_response.first) {
-                results.error_type = col_values_response.first;
-                return results;
-            }
-            FIELDS.clear();
-            FIELDS = regions_data_response.second;
-            results.col_values = col_values_response.second;
-            results.metrics = calculateAllMetrics(results.col_values);
-            break;
+        FIELDS.clear();
+        FIELDS = regions_data_response.second;
+        auto col_values_response = getColValues(args.regions, args.column);
+        if (col_values_response.first) {
+            results.error_type = col_values_response.first;
+            return results;
         }
-        default: {
-            results.error_type = BAD_CODE;
-            break;
-        }
+        results.col_values = col_values_response.second;
+        results.metrics = calculateAllMetrics(results.col_values);
+    } else {
+        results.error_type = BAD_CODE;
     }
+    results.error_type = OK;
     return results;
 }
 
@@ -84,8 +77,8 @@ pair <err_t, vector <vector <vector <double>>>> getColValues(const vector <strin
 
     for (auto record : FIELDS) {
         int region_index = distance(regions.begin(), find(regions.begin(), regions.end(), record.at(1)));
-        all_col_values.at(region_index).at(0).push_back(stoi(record.at(0)));
-        all_col_values.at(region_index).at(1).push_back(stoi(record.at(column_index)));
+        all_col_values.at(region_index).at(0).push_back(stod(record.at(0)));
+        all_col_values.at(region_index).at(1).push_back(stod(record.at(column_index)));
     }
     return {OK, all_col_values};
 }

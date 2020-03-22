@@ -84,7 +84,9 @@ void MainWindow::showFields() {
 
 void MainWindow::showResults() {
     op_args request_args = {};
+    request_args.path = ui->ln_path->text().toStdString();
     request_args.column = ui->ln_column->text().toStdString();
+    request_args.years = {ui->ln_init_year->text().toInt(), ui->ln_final_year->text().toInt()};
     request_args.operation_type = CALCULATE_METRICS;
 
     QList<QListWidgetItem*> items = ui->lst_regions->findItems(QString("*"), Qt::MatchWrap | Qt::MatchWildcard);
@@ -134,7 +136,18 @@ void MainWindow::showMetrics(res_t loaded_data) {
 
 void MainWindow::showPlot(res_t loaded_data)
 {
-
+    for (size_t i = 0; i < loaded_data.col_values.size(); i++) {
+        ui->wdg_plot->addGraph();
+        QVector <double> years = QVector<double>(loaded_data.col_values.at(i).at(0).begin(), loaded_data.col_values.at(i).at(0).end());
+        QVector <double> column = QVector<double>(loaded_data.col_values.at(i).at(1).begin(), loaded_data.col_values.at(i).at(1).end());
+        ui->wdg_plot->graph(i)->setData(years, column);
+        if (!i) {
+            ui->wdg_plot->graph(i)->rescaleAxes();
+        } else {
+            ui->wdg_plot->graph(i)->rescaleAxes(true);
+        }
+    }
+    ui->wdg_plot->replot();
 }
 
 void MainWindow::addRegion()
