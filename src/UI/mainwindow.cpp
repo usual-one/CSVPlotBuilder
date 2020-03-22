@@ -116,15 +116,18 @@ void MainWindow::showResults() {
 }
 
 void MainWindow::showMetrics(res_t loaded_data) {
+    const int metrics_count = 3;
     QStandardItemModel *model = new QStandardItemModel;
     model->setHorizontalHeaderLabels({"Metric", "Value"});
-    model->setItem(0, 0, new QStandardItem("Minimum"));
-    model->setItem(1, 0, new QStandardItem("Maximum"));
-    model->setItem(2, 0, new QStandardItem("Median"));
 
-    model->setItem(0, 1, new QStandardItem(QString::number(loaded_data.metrics.at(0))));
-    model->setItem(1, 1, new QStandardItem(QString::number(loaded_data.metrics.at(1))));
-    model->setItem(2, 1, new QStandardItem(QString::number(loaded_data.metrics.at(2))));
+    for (size_t region_index = 0; region_index < loaded_data.metrics.size(); region_index++) {
+        model->setItem(region_index * metrics_count, 0, new QStandardItem("Minimum"));
+        model->setItem(region_index * metrics_count + 1, 0, new QStandardItem("Maximum"));
+        model->setItem(region_index * metrics_count + 2, 0, new QStandardItem("Median"));
+        model->setItem(region_index * metrics_count, 1, new QStandardItem(QString::number(loaded_data.metrics.at(region_index).at(0))));
+        model->setItem(region_index * metrics_count + 1, 1, new QStandardItem(QString::number(loaded_data.metrics.at(region_index).at(1))));
+        model->setItem(region_index * metrics_count + 2, 1, new QStandardItem(QString::number(loaded_data.metrics.at(region_index).at(2))));
+    }
 
     ui->tbl_res->setModel(model);
 }

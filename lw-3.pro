@@ -21,11 +21,13 @@ SOURCES += \
     src/UI/mainwindow.cpp \
     src/UI/plot.cpp \
     src/logics/logics.cpp \
+    src/logics/utils.cpp
 
 HEADERS += \
     include/UI/plot.h \
     include/logics/logics.h \
     include/UI/mainwindow.h \
+    include/logics/utils.h \
     lib/qcustomplot.h
 
 FORMS += \
