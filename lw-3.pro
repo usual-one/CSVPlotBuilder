@@ -18,16 +18,16 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     lib/qcustomplot.cpp \
     main.cpp \
+    src/UI/UI_utils.cpp \
     src/UI/mainwindow.cpp \
-    src/UI/plot.cpp \
     src/logics/logics.cpp \
-    src/logics/utils.cpp
+    src/logics/logics_utils.cpp
 
 HEADERS += \
-    include/UI/plot.h \
+    include/UI/UI_utils.h \
     include/logics/logics.h \
     include/UI/mainwindow.h \
-    include/logics/utils.h \
+    include/logics/logics_utils.h \
     lib/qcustomplot.h
 
 FORMS += \

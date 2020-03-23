@@ -30,10 +30,13 @@ private slots:
     void addRegion();
 
 private:
+    void setColors(int number);
+
     void showMetrics(res_t loaded_data);
 
     void showPlot(res_t loaded_data);
 
     Ui::MainWindow *ui;
+    QVector <QColor> used_colors;
 };
 #endif // MAINWINDOW_H

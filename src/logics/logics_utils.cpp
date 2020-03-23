@@ -1,4 +1,6 @@
-#include "include/logics/utils.h"
+#include "include/logics/logics_utils.h"
+#include <ctime>
+
 
 // std::string ------------------------------------------------------------------------------------
 
@@ -29,4 +31,10 @@ std::vector <std::string> splitStr(const std::string &str, const std::string &se
     return arr;
 }
 
-// ------------------------------------------------------------------------------------------------
+// int --------------------------------------------------------------------------------------------
+
+int generateRandInt(int lowest, int highest)
+{
+    srand(time(nullptr));
+    return rand() % highest + lowest;
+}

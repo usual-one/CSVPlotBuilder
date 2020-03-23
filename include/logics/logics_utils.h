@@ -1,5 +1,5 @@
-#ifndef UTILS_H
-#define UTILS_H
+#ifndef LOGICS_UTILS_H
+#define LOGICS_UTILS_H
 
 #include <string>
 #include <vector>
@@ -10,6 +10,8 @@ bool isNumber(const std::string &str);
 
 std::vector <std::string> splitStr(const std::string &str, const std::string &sep);
 
-// ------------------------------------------------------------------------------------------------
+// int --------------------------------------------------------------------------------------------
 
-#endif // UTILS_H
+int generateRandInt(int lowest, int highest);
+
+#endif // LOGICS_UTILS_H

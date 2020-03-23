@@ -1,12 +1,11 @@
 #include "include/UI/mainwindow.h"
 #include "ui_mainwindow.h"
+#include "include/logics/logics.h"
+#include "include/logics/logics_utils.h"
+#include "include/UI/UI_utils.h"
 
 #include <QFileDialog>
 #include <QStandardItemModel>
-
-#include <QDebug>
-
-#include "include/logics/logics.h"
 
 #define ERROR_DISPLAYING_TIMEOUT 2000
 
@@ -30,7 +29,6 @@ void MainWindow::setPath() {
                                                      tr("CSV tables (*.csv)"));
     ui->ln_path->setText(file_path);
 }
-
 
 void MainWindow::showFields() {
     op_args request_args = {};
@@ -79,6 +77,18 @@ void MainWindow::showFields() {
     if (ui->ln_region->text().size()) {
         ui->lst_regions->clear();
         ui->lst_regions->addItem(ui->ln_region->text());
+
+        used_colors.clear();
+        setColors(ui->lst_regions->count());
+        ui->lst_regions->item(ui->lst_regions->count() - 1)->setIcon(createRect(32, 32, *(used_colors.end() - 1)));
+
+        ui->ln_column->clear();
+        ui->ln_add_region->clear();
+
+        ui->wdg_plot->clearGraphs();
+        ui->wdg_plot->replot();
+
+        clearTable(ui->tbl_res);
     }
 }
 
@@ -119,6 +129,24 @@ void MainWindow::showResults() {
     showPlot(response);
 }
 
+void MainWindow::setColors(int number) {
+    QVector <QColor> usable_colors = {Qt::black, Qt::cyan, Qt::darkCyan, Qt::red, Qt::darkRed, Qt::magenta, Qt::darkMagenta,
+                                      Qt::green, Qt::darkGreen, Qt::darkYellow, Qt::blue, Qt::darkBlue, Qt::gray, Qt::darkGray};
+    for (auto color : used_colors) {
+        usable_colors.removeAll(color);
+    }
+    number -= used_colors.size();
+    if (usable_colors.size() < number) {
+        return;
+    }
+
+    for (int i = 0; i < number; i++) {
+        int color_index = generateRandInt(0, usable_colors.size() - 1);
+        used_colors.push_back(usable_colors.at(color_index));
+        usable_colors.removeAll(*(used_colors.end() - 1));
+    }
+}
+
 void MainWindow::showMetrics(res_t loaded_data) {
     const int metrics_count = 3;
     QStandardItemModel *model = new QStandardItemModel;
@@ -139,6 +167,8 @@ void MainWindow::showMetrics(res_t loaded_data) {
 void MainWindow::showPlot(res_t loaded_data)
 {
     const QString xAxisLabel = "year";
+    ui->wdg_plot->xAxis->setLabel(xAxisLabel);
+    ui->wdg_plot->yAxis->setLabel(QString::fromStdString(loaded_data.col_name));
     for (size_t i = 0; i < loaded_data.col_values.size(); i++) {
         ui->wdg_plot->addGraph();
         QVector <double> years = QVector<double>(loaded_data.col_values.at(i).at(0).begin(), loaded_data.col_values.at(i).at(0).end());
@@ -150,14 +180,14 @@ void MainWindow::showPlot(res_t loaded_data)
             ui->wdg_plot->graph(i)->rescaleAxes(true);
         }
         ui->wdg_plot->graph(i)->setScatterStyle(QCPScatterStyle::ssDisc);
-        ui->wdg_plot->xAxis->setLabel(xAxisLabel);
-        ui->wdg_plot->yAxis->setLabel(QString::fromStdString(loaded_data.col_name));
+        ui->wdg_plot->graph(i)->setPen(QPen(used_colors.at(i)));
     }
     ui->wdg_plot->replot();
 }
 
 void MainWindow::addRegion()
 {
+    const int color_count = 14;
     QString region = ui->ln_add_region->text();
     ui->ln_add_region->clear();
 
@@ -171,5 +201,12 @@ void MainWindow::addRegion()
         return;
     }
 
+    if (ui->lst_regions->count() >= color_count) {
+        ui->statusBar->showMessage("Too many regions", ERROR_DISPLAYING_TIMEOUT);
+        return;
+    }
+
     ui->lst_regions->addItem(region);
+    setColors(ui->lst_regions->count());
+    ui->lst_regions->item(ui->lst_regions->count() - 1)->setIcon(createRect(32, 32, *(used_colors.end() - 1)));
 }

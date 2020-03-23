@@ -1,5 +1,5 @@
 #include "include/logics/logics.h"
-#include "include/logics/utils.h"
+#include "include/logics/logics_utils.h"
 
 #include <fstream>
 #include <utility>
