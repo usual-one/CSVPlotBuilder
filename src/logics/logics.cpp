@@ -8,6 +8,20 @@
 vector <string> HEADERS = {};
 vector <vector<string>> FIELDS = {};
 
+static int nameToInt(const vector <string> &names, const string &name) {
+    int column_index = -1;
+    if (isNumber(name)) {
+        column_index = stoi(name) - 1;
+    } else {
+        auto it = find(names.begin(), names.end(), name);
+        if (it == names.end()) {
+            return -1;
+        }
+        column_index = distance(names.begin(), it);
+    }
+    return column_index;
+}
+
 res_t exec_op(op_args args) {
     res_t results = {};
     if (args.operation_type == LOAD_DATA) {
@@ -28,6 +42,7 @@ res_t exec_op(op_args args) {
             results.error_type = col_values_response.first;
             return results;
         }
+        results.col_name = HEADERS.at(nameToInt(HEADERS, args.column));
         results.col_values = col_values_response.second;
         results.metrics = calculateAllMetrics(results.col_values);
     } else {
@@ -49,22 +64,10 @@ vector <vector <double>> calculateAllMetrics(const vector <vector <vector <doubl
     return all_metrics;
 }
 
-static int nameToInt(const vector <string> &names, const string &name) {
-    auto it = find(names.begin(), names.end(), name);
-    if (it == names.end()) {
-        return -1;
-    }
-    return distance(names.begin(), it);
-}
-
 pair <err_t, vector <vector <vector <double>>>> getColValues(const vector <string> &regions, const string &column) {
     const vector <int> column_borders = {2, 6};
-    int column_index = -1;
-    if (isNumber(column)) {
-        column_index = stoi(column) - 1;
-    } else {
-        column_index = nameToInt(HEADERS, column);
-    }
+
+    int column_index = nameToInt(HEADERS, column);
 
     if (!(column_borders[0] <= column_index && column_index <= column_borders[1])) {
         return {WRONG_COLUMN_NAME, {}};
@@ -127,19 +130,6 @@ static err_t isValid(const vector <string> &record, const string &region, pair<i
         }
     }
     return OK;
-}
-
-vector <string> splitStr(const string &str, const string &sep) {
-    vector <string> arr;
-    size_t prev = 0;
-    size_t next;
-    size_t delta = sep.length();
-    while ((next = str.find(sep, prev)) != string::npos) {
-        arr.push_back(str.substr(prev, next - prev));
-        prev = next + delta;
-    }
-    arr.push_back(str.substr(prev));
-    return arr;
 }
 
 pair <err_t, pair <vector <string>, vector <vector <string>>>> readCSV(const string &path, const string &region, pair<int, int> years) {

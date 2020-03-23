@@ -101,7 +101,7 @@ void MainWindow::showResults() {
         return;
     }
     if (response.error_type == WRONG_COLUMN_NAME) {
-        ui->statusBar->showMessage("Such column does not exist", ERROR_DISPLAYING_TIMEOUT);
+        ui->statusBar->showMessage("Wrong column name or number", ERROR_DISPLAYING_TIMEOUT);
         return;
     }
     if (response.error_type == INVALID_COLUMN_VALUES) {
@@ -112,6 +112,8 @@ void MainWindow::showResults() {
         ui->statusBar->showMessage("Column is empty", ERROR_DISPLAYING_TIMEOUT);
         return;
     }
+
+    ui->ln_column->setText(QString::fromStdString(response.col_name));
 
     showMetrics(response);
     showPlot(response);
@@ -136,6 +138,7 @@ void MainWindow::showMetrics(res_t loaded_data) {
 
 void MainWindow::showPlot(res_t loaded_data)
 {
+    const QString xAxisLabel = "year";
     for (size_t i = 0; i < loaded_data.col_values.size(); i++) {
         ui->wdg_plot->addGraph();
         QVector <double> years = QVector<double>(loaded_data.col_values.at(i).at(0).begin(), loaded_data.col_values.at(i).at(0).end());
@@ -146,6 +149,9 @@ void MainWindow::showPlot(res_t loaded_data)
         } else {
             ui->wdg_plot->graph(i)->rescaleAxes(true);
         }
+        ui->wdg_plot->graph(i)->setScatterStyle(QCPScatterStyle::ssDisc);
+        ui->wdg_plot->xAxis->setLabel(xAxisLabel);
+        ui->wdg_plot->yAxis->setLabel(QString::fromStdString(loaded_data.col_name));
     }
     ui->wdg_plot->replot();
 }

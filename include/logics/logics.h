@@ -43,6 +43,7 @@ typedef struct {
     vector <string> headers;
     vector <vector <double>> metrics;
     // [region1[metric1, metric2, ...], region2[metric1, metric2, ...], ...]
+    string col_name;
     vector <vector <vector <double>>> col_values;
     // [region1[[years], [values]], region2[[years], [values]], ...]
 } res_t;
@@ -57,9 +58,7 @@ pair <err_t, vector <vector <string>>> getRegionsData(const string &path, const 
 
 vector <vector <double>> calculateAllMetrics(const vector <vector <vector <double>>> &col_values);
 
-vector <string> splitStr(const string &str, const string &sep);
-
-tuple <err_t, double> getMetrics(const string &column, metrics_t type);
+//tuple <err_t, double> getMetrics(const string &column, metrics_t type);
 
 double getMinimum(const vector<double> &arr);
 
