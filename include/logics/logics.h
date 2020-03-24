@@ -41,8 +41,8 @@ typedef struct {
     err_t error_type;
     vector <vector <string>> arr;
     vector <string> headers;
-    vector <vector <double>> metrics;
-    // [region1[metric1, metric2, ...], region2[metric1, metric2, ...], ...]
+    vector <vector <vector <double>>> metrics;
+    // [region1[[years], [metrics]], region2[[years], [metrics]], ...]
     string col_name;
     vector <vector <vector <double>>> col_values;
     // [region1[[years], [values]], region2[[years], [values]], ...]
@@ -56,7 +56,7 @@ pair <err_t, vector <vector <vector <double>>>> getColValues(const vector <strin
 
 pair <err_t, vector <vector <string>>> getRegionsData(const string &path, const vector <string> &regions, pair<int, int> years);
 
-vector <vector <double>> calculateAllMetrics(const vector <vector <vector <double>>> &col_values);
+vector <vector <vector <double>>> calculateAllMetrics(const vector <vector <vector <double>>> &col_values);
 
 //tuple <err_t, double> getMetrics(const string &column, metrics_t type);
 

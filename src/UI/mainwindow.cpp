@@ -156,9 +156,9 @@ void MainWindow::showMetrics(res_t loaded_data) {
         model->setItem(region_index * metrics_count, 0, new QStandardItem("Minimum"));
         model->setItem(region_index * metrics_count + 1, 0, new QStandardItem("Maximum"));
         model->setItem(region_index * metrics_count + 2, 0, new QStandardItem("Median"));
-        model->setItem(region_index * metrics_count, 1, new QStandardItem(QString::number(loaded_data.metrics.at(region_index).at(0))));
-        model->setItem(region_index * metrics_count + 1, 1, new QStandardItem(QString::number(loaded_data.metrics.at(region_index).at(1))));
-        model->setItem(region_index * metrics_count + 2, 1, new QStandardItem(QString::number(loaded_data.metrics.at(region_index).at(2))));
+        model->setItem(region_index * metrics_count, 1, new QStandardItem(QString::number(loaded_data.metrics.at(region_index)[1][0])));
+        model->setItem(region_index * metrics_count + 1, 1, new QStandardItem(QString::number(loaded_data.metrics.at(region_index)[1][1])));
+        model->setItem(region_index * metrics_count + 2, 1, new QStandardItem(QString::number(loaded_data.metrics.at(region_index)[1][2])));
     }
 
     ui->tbl_res->setModel(model);
@@ -169,18 +169,26 @@ void MainWindow::showPlot(res_t loaded_data)
     const QString xAxisLabel = "year";
     ui->wdg_plot->xAxis->setLabel(xAxisLabel);
     ui->wdg_plot->yAxis->setLabel(QString::fromStdString(loaded_data.col_name));
-    for (size_t i = 0; i < loaded_data.col_values.size(); i++) {
+    for (size_t i = 0; i < loaded_data.col_values.size(); i += 2) {
         ui->wdg_plot->addGraph();
-        QVector <double> years = QVector<double>(loaded_data.col_values.at(i).at(0).begin(), loaded_data.col_values.at(i).at(0).end());
-        QVector <double> column = QVector<double>(loaded_data.col_values.at(i).at(1).begin(), loaded_data.col_values.at(i).at(1).end());
+        QVector <double> years = QVector<double>(loaded_data.col_values[i][0].begin(), loaded_data.col_values[i][0].end());
+        QVector <double> column = QVector<double>(loaded_data.col_values[i][1].begin(), loaded_data.col_values[i][1].end());
         ui->wdg_plot->graph(i)->setData(years, column);
         if (!i) {
             ui->wdg_plot->graph(i)->rescaleAxes();
         } else {
             ui->wdg_plot->graph(i)->rescaleAxes(true);
         }
-        ui->wdg_plot->graph(i)->setScatterStyle(QCPScatterStyle::ssDisc);
-        ui->wdg_plot->graph(i)->setPen(QPen(used_colors.at(i)));
+        ui->wdg_plot->graph(i)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 4));
+        ui->wdg_plot->graph(i)->setPen(QPen(used_colors[i / 2]));
+
+        ui->wdg_plot->addGraph();
+        QVector <double> metrics_years = QVector<double>(loaded_data.metrics[i][0].begin(), loaded_data.metrics[i][0].end());
+        QVector <double> metrics_values = QVector<double>(loaded_data.metrics[i][1].begin(), loaded_data.metrics[i][1].end());
+        ui->wdg_plot->graph(i + 1)->setData(metrics_years, metrics_values);
+        ui->wdg_plot->graph(i + 1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 6));
+        ui->wdg_plot->graph(i + 1)->setLineStyle(QCPGraph::lsNone);
+        ui->wdg_plot->graph(i + 1)->setPen(QPen(used_colors[i / 2]));
     }
     ui->wdg_plot->replot();
 }

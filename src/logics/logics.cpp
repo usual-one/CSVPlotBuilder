@@ -52,13 +52,33 @@ res_t exec_op(op_args args) {
     return results;
 }
 
-vector <vector <double>> calculateAllMetrics(const vector <vector <vector <double>>> &col_values) {
-    vector <vector <double>> all_metrics = {};
+vector <vector <vector <double>>> calculateAllMetrics(const vector <vector <vector <double>>> &col_values) {
+    vector <vector <vector <double>>> all_metrics = {};
+    // all_metrics = [region1[[years], [metrics]], region2[[years], [metrics]], ...]
     for (auto region : col_values) {
-        vector <double> region_metrics = {};
-        region_metrics.push_back(getMinimum(region.at(1)));
-        region_metrics.push_back(getMaximum(region.at(1)));
-        region_metrics.push_back(getMedian(region.at(1)));
+        // region = [[years], [values]]
+        vector <vector <double>> region_metrics = {{}, {}};
+        // region_metrics = [[years], [metrics]]
+        region_metrics[1].push_back(getMinimum(region[1]));
+        region_metrics[1].push_back(getMaximum(region[1]));
+        region_metrics[1].push_back(getMedian(region[1]));
+        region_metrics[0].push_back(region[0][getIndex(region[1], region_metrics[1][0])]); // minimum
+        region_metrics[0].push_back(region[0][getIndex(region[1], region_metrics[1][1])]); // maximum
+        int median_index = getIndex(region[1], region_metrics[1][2]);
+        if (median_index == -1) {
+            vector <int> places = findPlaces(region[1], region_metrics[1][2]);
+            for (auto place : places) {
+                // x0 = (((y0 - y1) * (x2 - x1)) / (y2 - y1)) + x1
+                // x0 - median_year, y0 - median_value
+                // x1, x2 - year, y1, y2 - values (nearest points)
+                double median_year = (((region_metrics[1][2] - region[1][place]) * (region[0][place + 1] - region[0][place])) / (region[1][place + 1] - region[1][place])) + region[0][place];
+                region_metrics[0].push_back(median_year);
+                region_metrics[1].push_back(region_metrics[1][2]);
+            }
+            region_metrics[1].pop_back();
+        } else {
+            region_metrics[0].push_back(region[0][median_index]);
+        }
         all_metrics.push_back(region_metrics);
     }
     return all_metrics;
