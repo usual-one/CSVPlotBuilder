@@ -18,6 +18,10 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->btn_load, SIGNAL(clicked()), this, SLOT(showFields()));
     connect(ui->btn_calculate, SIGNAL(clicked()), this, SLOT(showResults()));
     connect(ui->btn_add, SIGNAL(clicked()), this, SLOT(addRegion()));
+
+    ui->lst_regions->setContextMenuPolicy(Qt::CustomContextMenu);
+
+    connect(ui->lst_regions, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(showRegionsContextMenu(const QPoint &)));
 }
 
 MainWindow::~MainWindow() {
@@ -174,6 +178,8 @@ void MainWindow::showPlot(res_t loaded_data)
         QVector <double> years = QVector<double>(loaded_data.col_values[i][0].begin(), loaded_data.col_values[i][0].end());
         QVector <double> column = QVector<double>(loaded_data.col_values[i][1].begin(), loaded_data.col_values[i][1].end());
         ui->wdg_plot->graph(i * 2)->setData(years, column);
+        ui->wdg_plot->graph(i * 2)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 4));
+        ui->wdg_plot->graph(i * 2)->setPen(QPen(used_colors[i]));
         if (!i) {
             ui->wdg_plot->graph(i * 2)->rescaleAxes();
         } else {
@@ -190,8 +196,6 @@ void MainWindow::showPlot(res_t loaded_data)
             max_range = loaded_data.metrics[i][1][1] + 0.1 * abs(loaded_data.metrics[i][1][1]);
             ui->wdg_plot->yAxis->setRange(min_range, max_range);
         }
-        ui->wdg_plot->graph(i * 2)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 4));
-        ui->wdg_plot->graph(i * 2)->setPen(QPen(used_colors[i]));
 
         ui->wdg_plot->addGraph();
         QVector <double> metrics_years = QVector<double>(loaded_data.metrics[i][0].begin(), loaded_data.metrics[i][0].end());
@@ -228,4 +232,20 @@ void MainWindow::addRegion()
     ui->lst_regions->addItem(region);
     setColors(ui->lst_regions->count());
     ui->lst_regions->item(ui->lst_regions->count() - 1)->setIcon(createRect(32, 32, *(used_colors.end() - 1)));
+}
+
+void MainWindow::showRegionsContextMenu(const QPoint &pos) {
+    QPoint globalPos = ui->lst_regions->mapToGlobal(pos);
+
+    QMenu menu;
+    menu.addAction("Delete", this, SLOT(deleteRegionsItem()));
+
+    menu.exec(globalPos);
+}
+
+void MainWindow::deleteRegionsItem() {
+    for (int i = 0; i < ui->lst_regions->selectedItems().size(); i++) {
+        QListWidgetItem *item = ui->lst_regions->takeItem(ui->lst_regions->currentRow());
+        delete item;
+    }
 }

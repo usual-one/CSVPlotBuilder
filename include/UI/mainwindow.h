@@ -29,6 +29,9 @@ private slots:
 
     void addRegion();
 
+    void showRegionsContextMenu(const QPoint &pos);
+
+    void deleteRegionsItem();
 private:
     void setColors(int number);
 
