@@ -169,26 +169,37 @@ void MainWindow::showPlot(res_t loaded_data)
     const QString xAxisLabel = "year";
     ui->wdg_plot->xAxis->setLabel(xAxisLabel);
     ui->wdg_plot->yAxis->setLabel(QString::fromStdString(loaded_data.col_name));
-    for (size_t i = 0; i < loaded_data.col_values.size(); i += 2) {
+    for (size_t i = 0; i < loaded_data.col_values.size(); i++) {
         ui->wdg_plot->addGraph();
         QVector <double> years = QVector<double>(loaded_data.col_values[i][0].begin(), loaded_data.col_values[i][0].end());
         QVector <double> column = QVector<double>(loaded_data.col_values[i][1].begin(), loaded_data.col_values[i][1].end());
-        ui->wdg_plot->graph(i)->setData(years, column);
+        ui->wdg_plot->graph(i * 2)->setData(years, column);
         if (!i) {
-            ui->wdg_plot->graph(i)->rescaleAxes();
+            ui->wdg_plot->graph(i * 2)->rescaleAxes();
         } else {
-            ui->wdg_plot->graph(i)->rescaleAxes(true);
+            ui->wdg_plot->graph(i * 2)->rescaleAxes(true);
         }
-        ui->wdg_plot->graph(i)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 4));
-        ui->wdg_plot->graph(i)->setPen(QPen(used_colors[i / 2]));
+
+        double max_range = ui->wdg_plot->yAxis->range().upper;
+        double min_range = ui->wdg_plot->yAxis->range().lower;
+        if (min_range > loaded_data.metrics[i][1][0] - 0.1 * abs(loaded_data.metrics[i][1][0])) {
+            min_range = loaded_data.metrics[i][1][0] - 0.1 * abs(loaded_data.metrics[i][1][0]);
+            ui->wdg_plot->yAxis->setRange(min_range, max_range);
+        }
+        if (max_range < loaded_data.metrics[i][1][1] + 0.1 * abs(loaded_data.metrics[i][1][1])) {
+            max_range = loaded_data.metrics[i][1][1] + 0.1 * abs(loaded_data.metrics[i][1][1]);
+            ui->wdg_plot->yAxis->setRange(min_range, max_range);
+        }
+        ui->wdg_plot->graph(i * 2)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 4));
+        ui->wdg_plot->graph(i * 2)->setPen(QPen(used_colors[i]));
 
         ui->wdg_plot->addGraph();
         QVector <double> metrics_years = QVector<double>(loaded_data.metrics[i][0].begin(), loaded_data.metrics[i][0].end());
         QVector <double> metrics_values = QVector<double>(loaded_data.metrics[i][1].begin(), loaded_data.metrics[i][1].end());
-        ui->wdg_plot->graph(i + 1)->setData(metrics_years, metrics_values);
-        ui->wdg_plot->graph(i + 1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 6));
-        ui->wdg_plot->graph(i + 1)->setLineStyle(QCPGraph::lsNone);
-        ui->wdg_plot->graph(i + 1)->setPen(QPen(used_colors[i / 2]));
+        ui->wdg_plot->graph(i * 2 + 1)->setData(metrics_years, metrics_values);
+        ui->wdg_plot->graph(i * 2 + 1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 6));
+        ui->wdg_plot->graph(i * 2 + 1)->setLineStyle(QCPGraph::lsNone);
+        ui->wdg_plot->graph(i * 2 + 1)->setPen(QPen(used_colors[i]));
     }
     ui->wdg_plot->replot();
 }

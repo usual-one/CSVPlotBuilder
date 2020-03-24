@@ -29,7 +29,7 @@ template <typename T>
 std::vector <int> findPlaces(const std::vector <T> &vect, T value) {
     std::vector <int> places = {};
     for (auto it = vect.begin(); it < vect.end() - 1; it++) {
-        if (*it <= value && value <= *(it + 1)) {
+        if ((*it <= value && value <= *(it + 1)) || (*(it + 1) <= value && value <= *it)) {
             places.push_back(std::distance(vect.begin(), it));
         }
     }
