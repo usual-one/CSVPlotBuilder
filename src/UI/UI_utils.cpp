@@ -1,7 +1,6 @@
 #include "include/UI/UI_utils.h"
 
 #include <QImage>
-#include <QStandardItemModel>
 
 QPixmap createRect(int width, int height, QColor &color)
 {
@@ -17,4 +16,19 @@ void clearTable(QTableView *table)
     QStandardItemModel *model = new QStandardItemModel;
     model->clear();
     table->setModel(model);
+}
+
+QList <QString> getAllListItemsText(QListWidget *list_widget) {
+    QList <QListWidgetItem *> items = list_widget->findItems(QString("*"), Qt::MatchWrap | Qt::MatchWildcard);
+    QList <QString> items_text = {};
+    for (auto item : items) {
+       items_text.push_back(item->text());
+    }
+    return items_text;
+}
+
+void setBoldFont(QStandardItem *item) {
+    QFont new_font = item->font();
+    new_font.setBold(true);
+    item->setFont(new_font);
 }

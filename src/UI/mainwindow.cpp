@@ -103,9 +103,8 @@ void MainWindow::showResults() {
     request_args.years = {ui->ln_init_year->text().toInt(), ui->ln_final_year->text().toInt()};
     request_args.operation_type = CALCULATE_METRICS;
 
-    QList<QListWidgetItem*> items = ui->lst_regions->findItems(QString("*"), Qt::MatchWrap | Qt::MatchWildcard);
-    for (auto item : items) {
-        request_args.regions.push_back(item->text().toStdString());
+    for (auto item : getAllListItemsText(ui->lst_regions)) {
+        request_args.regions.push_back(item.toStdString());
     }
 
     res_t response = exec_op(request_args);
@@ -152,17 +151,26 @@ void MainWindow::setColors(int number) {
 }
 
 void MainWindow::showMetrics(res_t loaded_data) {
+    QList <QString> region_names = getAllListItemsText(ui->lst_regions);
+
     const int metrics_count = 3;
     QStandardItemModel *model = new QStandardItemModel;
     model->setHorizontalHeaderLabels({"Metric", "Value"});
 
     for (size_t region_index = 0; region_index < loaded_data.metrics.size(); region_index++) {
-        model->setItem(region_index * metrics_count, 0, new QStandardItem("Minimum"));
-        model->setItem(region_index * metrics_count + 1, 0, new QStandardItem("Maximum"));
-        model->setItem(region_index * metrics_count + 2, 0, new QStandardItem("Median"));
-        model->setItem(region_index * metrics_count, 1, new QStandardItem(QString::number(loaded_data.metrics.at(region_index)[1][0])));
-        model->setItem(region_index * metrics_count + 1, 1, new QStandardItem(QString::number(loaded_data.metrics.at(region_index)[1][1])));
-        model->setItem(region_index * metrics_count + 2, 1, new QStandardItem(QString::number(loaded_data.metrics.at(region_index)[1][2])));
+        auto item_region_label = new QStandardItem("Region");
+        setBoldFont(item_region_label);
+        model->setItem(region_index * (metrics_count + 1) + 0, 0, item_region_label);
+        model->setItem(region_index * (metrics_count + 1) + 1, 0, new QStandardItem("Minimum"));
+        model->setItem(region_index * (metrics_count + 1) + 2, 0, new QStandardItem("Maximum"));
+        model->setItem(region_index * (metrics_count + 1) + 3, 0, new QStandardItem("Median"));
+
+        auto item_region_value = new QStandardItem(region_names[region_index]);
+        setBoldFont(item_region_value);
+        model->setItem(region_index * (metrics_count + 1) + 0, 1, item_region_value);
+        model->setItem(region_index * (metrics_count + 1) + 1, 1, new QStandardItem(QString::number(loaded_data.metrics[region_index][1][0])));
+        model->setItem(region_index * (metrics_count + 1) + 2, 1, new QStandardItem(QString::number(loaded_data.metrics[region_index][1][1])));
+        model->setItem(region_index * (metrics_count + 1) + 3, 1, new QStandardItem(QString::number(loaded_data.metrics[region_index][1][2])));
     }
 
     ui->tbl_res->setModel(model);
