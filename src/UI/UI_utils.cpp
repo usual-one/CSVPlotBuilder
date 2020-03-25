@@ -39,4 +39,9 @@ QList <QString> getAllListItemsText(QListWidget *list_widget) {
     return items_text;
 }
 
-// ------------------------------------------------------------------------------------------------
+// QCustomPlot ------------------------------------------------------------------------------------
+
+void clearPlot(QCustomPlot *plot_widget) {
+    plot_widget->clearGraphs();
+    plot_widget->replot();
+}

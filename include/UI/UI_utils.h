@@ -1,6 +1,8 @@
 #ifndef UI_UTILS_H
 #define UI_UTILS_H
 
+#include "lib/qcustomplot.h"
+
 #include <QPixmap>
 #include <QColor>
 #include <QTableView>
@@ -21,6 +23,8 @@ void setBoldFont(QStandardItem *item);
 
 QList <QString> getAllListItemsText(QListWidget *list_widget);
 
-// ------------------------------------------------------------------------------------------------
+// QCustomPlot ------------------------------------------------------------------------------------
+
+void clearPlot(QCustomPlot *plot_widget);
 
 #endif // UI_UTILS_H

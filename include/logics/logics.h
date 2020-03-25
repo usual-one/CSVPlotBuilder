@@ -36,6 +36,12 @@ typedef struct {
 } metric_values_t;
 
 typedef struct {
+    vector <double> values;
+    vector <double> years;
+} column_values_t;
+
+
+typedef struct {
     op_t operation_type;
     string path;
     vector <string> regions;
@@ -50,8 +56,8 @@ typedef struct {
     vector <metric_values_t> metrics;
     // [region1[metric_values], region2[metric_values], ...]
     string col_name;
-    vector <vector <vector <double>>> col_values;
-    // [region1[[years], [values]], region2[[years], [values]], ...]
+    vector <column_values_t> col_values;
+    // [region1[column_values], region2[column_values], ...]
 } res_t;
 
 
@@ -60,13 +66,11 @@ res_t exec_op(op_args args);
 
 pair <err_t, pair <vector <string>, vector <vector <string>>>> readCSV(const string &path, const string &region, pair<int, int> years);
 
-pair <err_t, vector <vector <vector <double>>>> getColValues(const vector <string> &regions, const string &column);
-
 pair <err_t, vector <vector <string>>> getRegionsData(const string &path, const vector <string> &regions, pair<int, int> years);
 
-vector <metric_values_t> calculateAllMetrics(const vector <vector <vector <double>>> &col_values);
+pair <err_t, vector <column_values_t>> getColValues(const vector <string> &regions, const string &column);
 
-//tuple <err_t, double> getMetrics(const string &column, metrics_t type);
+vector <metric_values_t> calculateAllMetrics(const vector <column_values_t> &region_values);
 
 double getMinimum(const vector<double> &arr);
 

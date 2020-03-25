@@ -40,6 +40,7 @@ void MainWindow::showFields() {
     request_args.regions.push_back(ui->ln_region->text().toStdString());
     request_args.years = {ui->ln_init_year->text().toInt(), ui->ln_final_year->text().toInt()};
     request_args.operation_type = LOAD_DATA;
+
     res_t response = exec_op(request_args);
 
     QStandardItemModel *model = new QStandardItemModel;
@@ -89,9 +90,7 @@ void MainWindow::showFields() {
         ui->ln_column->clear();
         ui->ln_add_region->clear();
 
-        ui->wdg_plot->clearGraphs();
-        ui->wdg_plot->replot();
-
+        clearPlot(ui->wdg_plot);
         clearTable(ui->tbl_res);
     }
 }
@@ -105,6 +104,14 @@ void MainWindow::showResults() {
 
     for (auto item : getAllListItemsText(ui->lst_regions)) {
         request_args.regions.push_back(item.toStdString());
+    }
+
+    if (!request_args.regions.size()) {
+        ui->statusBar->showMessage("No regions selected", ERROR_DISPLAYING_TIMEOUT);
+        ui->ln_column->clear();
+        clearTable(ui->tbl_res);
+        clearPlot(ui->wdg_plot);
+        return;
     }
 
     res_t response = exec_op(request_args);
@@ -183,8 +190,8 @@ void MainWindow::showPlot(res_t loaded_data)
     ui->wdg_plot->yAxis->setLabel(QString::fromStdString(loaded_data.col_name));
     for (size_t i = 0; i < loaded_data.col_values.size(); i++) {
         ui->wdg_plot->addGraph();
-        QVector <double> years = QVector<double>(loaded_data.col_values[i][0].begin(), loaded_data.col_values[i][0].end());
-        QVector <double> column = QVector<double>(loaded_data.col_values[i][1].begin(), loaded_data.col_values[i][1].end());
+        QVector <double> years = QVector<double>(loaded_data.col_values[i].years.begin(), loaded_data.col_values[i].years.end());
+        QVector <double> column = QVector<double>(loaded_data.col_values[i].values.begin(), loaded_data.col_values[i].values.end());
         ui->wdg_plot->graph(i * 2)->setData(years, column);
         ui->wdg_plot->graph(i * 2)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 4));
         ui->wdg_plot->graph(i * 2)->setPen(QPen(used_colors[i]));
