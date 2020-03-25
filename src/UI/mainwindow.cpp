@@ -116,6 +116,10 @@ void MainWindow::showResults() {
 
     res_t response = exec_op(request_args);
 
+    if (response.error_type == REGION_NOT_FOUND) {
+        ui->statusBar->showMessage("Wrong region name", ERROR_DISPLAYING_TIMEOUT);
+        return;
+    }
     if (response.error_type == DATA_NOT_FOUND) {
         ui->statusBar->showMessage("Data is not loaded", ERROR_DISPLAYING_TIMEOUT);
         return;
@@ -185,6 +189,7 @@ void MainWindow::showMetrics(res_t loaded_data) {
 
 void MainWindow::showPlot(res_t loaded_data)
 {
+    clearPlot(ui->wdg_plot);
     const QString xAxisLabel = "year";
     ui->wdg_plot->xAxis->setLabel(xAxisLabel);
     ui->wdg_plot->yAxis->setLabel(QString::fromStdString(loaded_data.col_name));
@@ -270,6 +275,7 @@ void MainWindow::showRegionsContextMenu(const QPoint &pos) {
 
 void MainWindow::deleteRegionsItem() {
     for (int i = 0; i < ui->lst_regions->selectedItems().size(); i++) {
+        used_colors.erase(used_colors.begin() + ui->lst_regions->currentRow());
         QListWidgetItem *item = ui->lst_regions->takeItem(ui->lst_regions->currentRow());
         delete item;
     }

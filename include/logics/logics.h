@@ -60,8 +60,6 @@ typedef struct {
     // [region1[column_values], region2[column_values], ...]
 } res_t;
 
-
-
 res_t exec_op(op_args args);
 
 pair <err_t, pair <vector <string>, vector <vector <string>>>> readCSV(const string &path, const string &region, pair<int, int> years);

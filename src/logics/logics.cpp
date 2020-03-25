@@ -68,10 +68,6 @@ static bool positiveNumberBetween(int number, pair<int, int> years) {
     return years.first <= number && number <= years.second;
 }
 
-static bool stringCmp(string str, string model) {
-    return str == model;
-}
-
 static err_t isValid(const vector <string> &record, const string &region, pair<int, int> years) {
     if (years.first != 0 || years.second != 0) {
         if (!record.at(0).size() || !isNumber(record.at(0))) {
@@ -85,7 +81,7 @@ static err_t isValid(const vector <string> &record, const string &region, pair<i
         if (!record.at(1).size()) {
             return REGION_NOT_FOUND;
         }
-        if (!stringCmp(record.at(1), region)) {
+        if (record.at(1) != region) {
             return REGION_NOT_FOUND;
         }
     }
@@ -123,7 +119,20 @@ pair <err_t, pair <vector <string>, vector <vector <string>>>> readCSV(const str
     return {OK, {headers, records}};
 }
 
+pair <err_t, vector <vector <string>>> getRegionsData(const string &path, const vector <string> &regions, pair<int, int> years) {
+    vector <vector <string>> region_data= {};
+    for (auto region : regions) {
+        auto reading_res = readCSV(path, region, years);
+        if (reading_res.first) {
+            return {reading_res.first, {}};
+        }
+        region_data.insert(region_data.end(), reading_res.second.second.begin(), reading_res.second.second.end());
+    }
+    return {OK, region_data};
+}
+
 vector <metric_values_t> calculateAllMetrics(const vector <column_values_t> &region_values) {
+
     vector <metric_values_t> all_metrics = {};
     // all_metrics = [region1[metric_values], region2[metric_values], ...]
     for (auto region : region_values) {
@@ -185,19 +194,13 @@ pair <err_t, vector <column_values_t>> getColValues(const vector <string> &regio
         all_col_values[region_index].years.push_back(stod(record[0]));
         all_col_values[region_index].values.push_back(stod(record[column_index]));
     }
-    return {OK, all_col_values};
-}
 
-pair <err_t, vector <vector <string>>> getRegionsData(const string &path, const vector <string> &regions, pair<int, int> years) {
-    vector <vector <string>> region_data= {};
-    for (auto region : regions) {
-        auto reading_res = readCSV(path, region, years);
-        if (reading_res.first) {
-            return {reading_res.first, {}};
+    for (auto region : all_col_values) {
+        if (!region.years.size() || !region.values.size()) {
+            return {COLUMN_IS_EMPTY, {}};
         }
-        region_data.insert(region_data.end(), reading_res.second.second.begin(), reading_res.second.second.end());
     }
-    return {OK, region_data};
+    return {OK, all_col_values};
 }
 
 double getMinimum(const vector <double> &arr) {
