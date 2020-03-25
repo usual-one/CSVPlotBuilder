@@ -17,12 +17,25 @@ int generateRandInt(int lowest, int highest);
 // std::vector ------------------------------------------------------------------------------------
 
 template <typename T>
-int getIndex(const std::vector <T> &vect, T elem) {
-    auto it = find(vect.begin(), vect.end(), elem);
-    if (it == vect.end()) {
+int getIndex(const std::vector <T> &vec, T elem) {
+    // returns first appearance of elem
+    auto it = find(vec.begin(), vec.end(), elem);
+    if (it == vec.end()) {
         return -1;
     }
-    return std::distance(vect.begin(), it);
+    return std::distance(vec.begin(), it);
+}
+
+template <typename T>
+std::vector <int> getIndices(const std::vector <T> &vec, T elem) {
+    std::vector <int> indices = {};
+
+    auto it = find(vec.begin(), vec.end(), elem);
+    while (it != vec.end()) {
+        indices.push_back(std::distance(vec.begin(), it));
+        it = find(it + 1, vec.end(), elem);
+    }
+    return indices;
 }
 
 template <typename T>
@@ -35,5 +48,7 @@ std::vector <int> findPlaces(const std::vector <T> &vect, T value) {
     }
     return places;
 }
+
+// ------------------------------------------------------------------------------------------------
 
 #endif // LOGICS_UTILS_H

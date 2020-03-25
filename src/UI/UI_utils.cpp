@@ -2,6 +2,8 @@
 
 #include <QImage>
 
+// QPixmap ----------------------------------------------------------------------------------------
+
 QPixmap createRect(int width, int height, QColor &color)
 {
     QImage rect_img = QImage(width, height, QImage::Format_RGB32);
@@ -11,12 +13,22 @@ QPixmap createRect(int width, int height, QColor &color)
     return rect_pixmap;
 }
 
+// QTableView, QStandartItemModel -----------------------------------------------------------------
+
 void clearTable(QTableView *table)
 {
     QStandardItemModel *model = new QStandardItemModel;
     model->clear();
     table->setModel(model);
 }
+
+void setBoldFont(QStandardItem *item) {
+    QFont new_font = item->font();
+    new_font.setBold(true);
+    item->setFont(new_font);
+}
+
+// QListWidget ------------------------------------------------------------------------------------
 
 QList <QString> getAllListItemsText(QListWidget *list_widget) {
     QList <QListWidgetItem *> items = list_widget->findItems(QString("*"), Qt::MatchWrap | Qt::MatchWildcard);
@@ -27,8 +39,4 @@ QList <QString> getAllListItemsText(QListWidget *list_widget) {
     return items_text;
 }
 
-void setBoldFont(QStandardItem *item) {
-    QFont new_font = item->font();
-    new_font.setBold(true);
-    item->setFont(new_font);
-}
+// ------------------------------------------------------------------------------------------------

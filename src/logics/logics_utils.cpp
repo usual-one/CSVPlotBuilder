@@ -1,6 +1,6 @@
 #include "include/logics/logics_utils.h"
-#include <ctime>
 
+#include <ctime>
 
 // std::string ------------------------------------------------------------------------------------
 
@@ -38,3 +38,5 @@ int generateRandInt(int lowest, int highest)
     srand(time(nullptr));
     return rand() % highest + lowest;
 }
+
+// ------------------------------------------------------------------------------------------------

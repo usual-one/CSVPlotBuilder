@@ -7,12 +7,20 @@
 #include <QListWidget>
 #include <QStandardItemModel>
 
+// QPixmap ----------------------------------------------------------------------------------------
+
 QPixmap createRect(int width, int height, QColor &color);
+
+// QTableView, QStandartItemModel -----------------------------------------------------------------
 
 void clearTable(QTableView *table);
 
+void setBoldFont(QStandardItem *item);
+
+// QListWidget ------------------------------------------------------------------------------------
+
 QList <QString> getAllListItemsText(QListWidget *list_widget);
 
-void setBoldFont(QStandardItem *item);
+// ------------------------------------------------------------------------------------------------
 
 #endif // UI_UTILS_H

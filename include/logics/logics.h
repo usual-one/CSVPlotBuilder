@@ -30,6 +30,12 @@ enum err_t {
 };
 
 typedef struct {
+    vector <double> metrics;
+    vector <vector <double>> years;
+    // [meric1[], metric2[], ...]
+} metric_values_t;
+
+typedef struct {
     op_t operation_type;
     string path;
     vector <string> regions;
@@ -41,12 +47,14 @@ typedef struct {
     err_t error_type;
     vector <vector <string>> arr;
     vector <string> headers;
-    vector <vector <vector <double>>> metrics;
-    // [region1[[years], [metrics]], region2[[years], [metrics]], ...]
+    vector <metric_values_t> metrics;
+    // [region1[metric_values], region2[metric_values], ...]
     string col_name;
     vector <vector <vector <double>>> col_values;
     // [region1[[years], [values]], region2[[years], [values]], ...]
 } res_t;
+
+
 
 res_t exec_op(op_args args);
 
@@ -56,7 +64,7 @@ pair <err_t, vector <vector <vector <double>>>> getColValues(const vector <strin
 
 pair <err_t, vector <vector <string>>> getRegionsData(const string &path, const vector <string> &regions, pair<int, int> years);
 
-vector <vector <vector <double>>> calculateAllMetrics(const vector <vector <vector <double>>> &col_values);
+vector <metric_values_t> calculateAllMetrics(const vector <vector <vector <double>>> &col_values);
 
 //tuple <err_t, double> getMetrics(const string &column, metrics_t type);
 

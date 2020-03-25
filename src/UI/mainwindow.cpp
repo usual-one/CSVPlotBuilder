@@ -168,9 +168,9 @@ void MainWindow::showMetrics(res_t loaded_data) {
         auto item_region_value = new QStandardItem(region_names[region_index]);
         setBoldFont(item_region_value);
         model->setItem(region_index * (metrics_count + 1) + 0, 1, item_region_value);
-        model->setItem(region_index * (metrics_count + 1) + 1, 1, new QStandardItem(QString::number(loaded_data.metrics[region_index][1][0])));
-        model->setItem(region_index * (metrics_count + 1) + 2, 1, new QStandardItem(QString::number(loaded_data.metrics[region_index][1][1])));
-        model->setItem(region_index * (metrics_count + 1) + 3, 1, new QStandardItem(QString::number(loaded_data.metrics[region_index][1][2])));
+        model->setItem(region_index * (metrics_count + 1) + 1, 1, new QStandardItem(QString::number(loaded_data.metrics[region_index].metrics[0])));
+        model->setItem(region_index * (metrics_count + 1) + 2, 1, new QStandardItem(QString::number(loaded_data.metrics[region_index].metrics[1])));
+        model->setItem(region_index * (metrics_count + 1) + 3, 1, new QStandardItem(QString::number(loaded_data.metrics[region_index].metrics[2])));
     }
 
     ui->tbl_res->setModel(model);
@@ -196,18 +196,28 @@ void MainWindow::showPlot(res_t loaded_data)
 
         double max_range = ui->wdg_plot->yAxis->range().upper;
         double min_range = ui->wdg_plot->yAxis->range().lower;
-        if (min_range > loaded_data.metrics[i][1][0] - 0.1 * abs(loaded_data.metrics[i][1][0])) {
-            min_range = loaded_data.metrics[i][1][0] - 0.1 * abs(loaded_data.metrics[i][1][0]);
+        if (min_range > loaded_data.metrics[i].metrics[0] - 0.1 * abs(loaded_data.metrics[i].metrics[0])) {
+            min_range = loaded_data.metrics[i].metrics[0] - 0.1 * abs(loaded_data.metrics[i].metrics[0]);
             ui->wdg_plot->yAxis->setRange(min_range, max_range);
         }
-        if (max_range < loaded_data.metrics[i][1][1] + 0.1 * abs(loaded_data.metrics[i][1][1])) {
-            max_range = loaded_data.metrics[i][1][1] + 0.1 * abs(loaded_data.metrics[i][1][1]);
+        if (max_range < loaded_data.metrics[i].metrics[1] + 0.1 * abs(loaded_data.metrics[i].metrics[1])) {
+            max_range = loaded_data.metrics[i].metrics[1] + 0.1 * abs(loaded_data.metrics[i].metrics[1]);
             ui->wdg_plot->yAxis->setRange(min_range, max_range);
         }
 
+        QVector <double> metrics_years = {};
+        QVector <double> metrics_values = {};
         ui->wdg_plot->addGraph();
-        QVector <double> metrics_years = QVector<double>(loaded_data.metrics[i][0].begin(), loaded_data.metrics[i][0].end());
-        QVector <double> metrics_values = QVector<double>(loaded_data.metrics[i][1].begin(), loaded_data.metrics[i][1].end());
+        for (auto metric_years : loaded_data.metrics[i].years) {
+            for (auto year : metric_years) {
+                metrics_years.push_back(year);
+            }
+        }
+        for (size_t metric_index = 0; metric_index < loaded_data.metrics[i].metrics.size(); metric_index++) {
+            for (size_t year_index = 0; year_index < loaded_data.metrics[i].years[metric_index].size(); year_index++) {
+                metrics_values.push_back(loaded_data.metrics[i].metrics[metric_index]);
+            }
+        }
         ui->wdg_plot->graph(i * 2 + 1)->setData(metrics_years, metrics_values);
         ui->wdg_plot->graph(i * 2 + 1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 6));
         ui->wdg_plot->graph(i * 2 + 1)->setLineStyle(QCPGraph::lsNone);

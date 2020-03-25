@@ -52,33 +52,43 @@ res_t exec_op(op_args args) {
     return results;
 }
 
-vector <vector <vector <double>>> calculateAllMetrics(const vector <vector <vector <double>>> &col_values) {
-    vector <vector <vector <double>>> all_metrics = {};
-    // all_metrics = [region1[[years], [metrics]], region2[[years], [metrics]], ...]
+vector <metric_values_t> calculateAllMetrics(const vector <vector <vector <double>>> &col_values) {
+    vector <metric_values_t> all_metrics = {};
+    // all_metrics = [region1[metric_values], region2[metric_values], ...]
     for (auto region : col_values) {
         // region = [[years], [values]]
-        vector <vector <double>> region_metrics = {{}, {}};
-        // region_metrics = [[years], [metrics]]
-        region_metrics[1].push_back(getMinimum(region[1]));
-        region_metrics[1].push_back(getMaximum(region[1]));
-        region_metrics[1].push_back(getMedian(region[1]));
-        region_metrics[0].push_back(region[0][getIndex(region[1], region_metrics[1][0])]); // minimum
-        region_metrics[0].push_back(region[0][getIndex(region[1], region_metrics[1][1])]); // maximum
-        int median_index = getIndex(region[1], region_metrics[1][2]);
-        if (median_index == -1) {
-            vector <int> places = findPlaces(region[1], region_metrics[1][2]);
+        metric_values_t region_metrics = {};
+        region_metrics.metrics.push_back(getMinimum(region[1]));
+        region_metrics.metrics.push_back(getMaximum(region[1]));
+        region_metrics.metrics.push_back(getMedian(region[1]));
+
+        region_metrics.years.push_back({});
+        for (auto index : getIndices(region[1], region_metrics.metrics[0])) { // minimum
+            region_metrics.years[0].push_back(region[0][index]);
+        }
+        region_metrics.years.push_back({});
+        for (auto index : getIndices(region[1], region_metrics.metrics[1])) { // maximum
+            region_metrics.years[1].push_back(region[0][index]);
+        }
+
+        region_metrics.years.push_back({});
+        vector <int> median_indices = getIndices(region[1], region_metrics.metrics[2]); // median
+        for (auto index : median_indices) {
+            region_metrics.years[2].push_back(region[0][index]);
+        }
+        if (!median_indices.size()) {
+            vector <int> places = findPlaces(region[1], region_metrics.metrics[2]);
             for (auto place : places) {
                 // x0 = (((y0 - y1) * (x2 - x1)) / (y2 - y1)) + x1
                 // x0 - median_year, y0 - median_value
                 // x1, x2 - year, y1, y2 - values (nearest points)
-                double median_year = (((region_metrics[1][2] - region[1][place]) * (region[0][place + 1] - region[0][place])) / (region[1][place + 1] - region[1][place])) + region[0][place];
-                region_metrics[0].push_back(median_year);
-                region_metrics[1].push_back(region_metrics[1][2]);
+                double median_year = (((region_metrics.metrics[2] - region[1][place]) * (region[0][place + 1] - region[0][place])) / (region[1][place + 1] - region[1][place])) + region[0][place];
+                region_metrics.years[2].push_back(median_year);
+                region_metrics.metrics.push_back(region_metrics.metrics[2]);
             }
-            region_metrics[1].pop_back();
-        } else {
-            region_metrics[0].push_back(region[0][median_index]);
+            region_metrics.metrics.pop_back();
         }
+
         all_metrics.push_back(region_metrics);
     }
     return all_metrics;
