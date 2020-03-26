@@ -29,7 +29,7 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::setPath() {
-    QString file_path = QFileDialog::getOpenFileName(this, "../lw-2/resource", "../lw-2/resource",
+    QString file_path = QFileDialog::getOpenFileName(this, "../lw-3/resource", "../lw-3/resource",
                                                      tr("CSV tables (*.csv)"));
     ui->ln_path->setText(file_path);
 }
