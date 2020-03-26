@@ -35,6 +35,9 @@ std::vector <std::string> splitStr(const std::string &str, const std::string &se
 
 int generateRandInt(int lowest, int highest)
 {
+    if (highest == 0) {
+        return 0;
+    }
     srand(time(nullptr));
     return rand() % highest + lowest;
 }

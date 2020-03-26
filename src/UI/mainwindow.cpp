@@ -72,8 +72,8 @@ void MainWindow::showFields() {
     model->setHorizontalHeaderLabels(horizontal_headers);
 
     for (size_t i = 0; i < fields.size(); i++) {
-        for (size_t j = 0; j < fields.at(i).size(); j++) {
-            model->setItem(i, j, new QStandardItem(QString::fromStdString(fields.at(i).at(j))));
+        for (size_t j = 0; j < fields[i].size(); j++) {
+            model->setItem(i, j, new QStandardItem(QString::fromStdString(fields[i][j])));
         }
     }
 
@@ -156,7 +156,7 @@ void MainWindow::setColors(int number) {
 
     for (int i = 0; i < number; i++) {
         int color_index = generateRandInt(0, usable_colors.size() - 1);
-        used_colors.push_back(usable_colors.at(color_index));
+        used_colors.push_back(usable_colors[color_index]);
         usable_colors.removeAll(*(used_colors.end() - 1));
     }
 }

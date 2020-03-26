@@ -25,7 +25,7 @@ static int nameToInt(const vector <string> &names, const string &name) {
 res_t exec_op(op_args args) {
     res_t results = {};
     if (args.operation_type == LOAD_DATA) {
-        auto csv = readCSV(args.path, args.regions.at(0), args.years);
+        auto csv = readCSV(args.path, args.regions[0], args.years);
         if (csv.first) {
             results.error_type = csv.first;
             return results;
@@ -48,7 +48,7 @@ res_t exec_op(op_args args) {
         }
         results.col_values = col_values_response.second;
 
-        results.col_name = HEADERS.at(nameToInt(HEADERS, args.column));
+        results.col_name = HEADERS[nameToInt(HEADERS, args.column)];
 
         results.metrics = calculateAllMetrics(results.col_values);
     } else {
@@ -70,18 +70,18 @@ static bool positiveNumberBetween(int number, pair<int, int> years) {
 
 static err_t isValid(const vector <string> &record, const string &region, pair<int, int> years) {
     if (years.first != 0 || years.second != 0) {
-        if (!record.at(0).size() || !isNumber(record.at(0))) {
+        if (!record[0].size() || !isNumber(record[0])) {
             return YEARS_NOT_FOUND;
         }
-        if (!positiveNumberBetween(stoi(record.at(0)), years)) {
+        if (!positiveNumberBetween(stoi(record[0]), years)) {
             return YEARS_NOT_FOUND;
         }
     }
     if (region.size()) {
-        if (!record.at(1).size()) {
+        if (!record[1].size()) {
             return REGION_NOT_FOUND;
         }
-        if (record.at(1) != region) {
+        if (record[1] != region) {
             return REGION_NOT_FOUND;
         }
     }
@@ -187,7 +187,7 @@ pair <err_t, vector <column_values_t>> getColValues(const vector <string> &regio
     }
 
     for (auto record : FIELDS) {
-        int region_index = distance(regions.begin(), find(regions.begin(), regions.end(), record.at(1)));
+        int region_index = distance(regions.begin(), find(regions.begin(), regions.end(), record[1]));
         if (!record[0].size() || !record[column_index].size()) {
             continue;
         }
@@ -215,7 +215,7 @@ double getMedian(const vector <double> &arr) {
     vector <double> tmp_arr(arr);
     sort(tmp_arr.begin(), tmp_arr.end());
     if (tmp_arr.size() % 2 == 1) {
-        return tmp_arr.at(tmp_arr.size() / 2);
+        return tmp_arr[tmp_arr.size() / 2];
     }
-    return (tmp_arr.at(tmp_arr.size() / 2) + tmp_arr.at(tmp_arr.size() / 2 - 1)) / 2;
+    return (tmp_arr[tmp_arr.size() / 2] + tmp_arr[tmp_arr.size() / 2 - 1]) / 2;
 }
