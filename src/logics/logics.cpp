@@ -113,6 +113,8 @@ pair <err_t, pair <vector <string>, vector <vector <string>>>> readCSV(const str
             records.push_back(record);
         }
     }
+        
+    fin.close();
     if (!records.size()) {
         return {error, {{}, {}}};
     }
