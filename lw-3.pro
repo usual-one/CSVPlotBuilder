@@ -16,7 +16,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    lib/qcustomplot.cpp \
     main.cpp \
     src/UI/UI_utils.cpp \
     src/UI/mainwindow.cpp \
@@ -31,7 +30,6 @@ HEADERS += \
     include/logics/logics.h \
     include/UI/mainwindow.h \
     include/logics/logics_utils.h \
-    lib/qcustomplot.h
 
 FORMS += \
     mainwindow.ui
