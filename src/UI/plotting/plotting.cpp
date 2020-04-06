@@ -95,11 +95,13 @@ static void drawAxes(canvas_t &canvas, const QPair <axis_t, axis_t> &axes) {
 
     canvas.painter->setPen(AXES_COLOR);
 
+    // axes
     canvas.painter->drawLine(axes.first.canvas_line.p1.x, axes.first.canvas_line.p1.y,
                              axes.first.canvas_line.p2.x, axes.first.canvas_line.p2.y);
     canvas.painter->drawLine(axes.second.canvas_line.p1.x, axes.second.canvas_line.p1.y,
                              axes.second.canvas_line.p2.x, axes.second.canvas_line.p2.y);
 
+    // point dashes, grid, point labels
     for (int i = 0; i < axes.first.canvas_points.size(); i++) {
         auto point = axes.first.canvas_points[i];
         canvas.painter->setPen(GRID_COLOR);
@@ -134,6 +136,7 @@ static void drawAxes(canvas_t &canvas, const QPair <axis_t, axis_t> &axes) {
         drawRotatedText(canvas, point_label.pos, point_label.text, -90);
     }
 
+    // axes labels
     label_t x_label;
     x_label.text = axes.first.name;
     x_label.size = {(double) font_metrics.horizontalAdvance(x_label.text),
@@ -179,6 +182,7 @@ static void drawGraph(canvas_t &canvas, const graph_t &graph) {
     canvas.painter->setPen(graph.color);
     canvas.painter->setBrush(QBrush(graph.color));
 
+    // values
     for (int i = 0; i < graph.x_values.size() - 1; i++) {
         canvas.painter->drawPie(graph.x_values[i] - DOT_DIAMETR / 2,
                                 graph.y_values[i] - DOT_DIAMETR / 2,
@@ -192,6 +196,7 @@ static void drawGraph(canvas_t &canvas, const graph_t &graph) {
                             DOT_DIAMETR, DOT_DIAMETR,
                             pie_circle_angle, pie_circle_angle);
 
+    // critical values
     for (int i = 0; i < graph.critical_x_values.size(); i++) {
         canvas.painter->drawPie(graph.critical_x_values[i] - critical_dot_size / 2,
                                 graph.critical_y_values[i] - critical_dot_size / 2,

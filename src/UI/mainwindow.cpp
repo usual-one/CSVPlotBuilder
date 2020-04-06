@@ -238,6 +238,10 @@ void MainWindow::addRegion() {
     QString region = ui->ln_add_region->text();
     ui->ln_add_region->clear();
 
+    if (!region.size()) {
+        ui->statusBar->showMessage("Wrong region name", ERROR_DISPLAYING_TIMEOUT);
+        return;
+    }
     if (!ui->lst_regions->count()) {
         ui->statusBar->showMessage("Main region is not selected", ERROR_DISPLAYING_TIMEOUT);
         return;
