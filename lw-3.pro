@@ -20,7 +20,7 @@ SOURCES += \
     main.cpp \
     src/UI/UI_utils.cpp \
     src/UI/mainwindow.cpp \
-    src/UI/plotting.cpp \
+    src/UI/plotting/plotting.cpp \
     src/logics/logics.cpp \
     src/logics/logics_utils.cpp
 

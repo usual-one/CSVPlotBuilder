@@ -207,6 +207,9 @@ canvas_t createCanvas(const QSize &size, const plot_t &plot) {
     canvas.pixmap = new QPixmap(size);
     canvas.painter = new QPainter(canvas.pixmap);
 
+    canvas.painter->setRenderHint(QPainter::Antialiasing);
+    canvas.painter->setRenderHint(QPainter::HighQualityAntialiasing);
+
     drawPlot(canvas, plot);
 
     return canvas;
