@@ -1,13 +1,12 @@
 #ifndef UI_UTILS_H
 #define UI_UTILS_H
 
-#include "lib/qcustomplot.h"
-
 #include <vector>
 
 #include <QPixmap>
 #include <QColor>
 #include <QTableView>
+#include <QLabel>
 #include <QListWidget>
 #include <QStandardItemModel>
 

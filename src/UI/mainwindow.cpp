@@ -6,6 +6,7 @@
 #include "include/UI/plotting/plotting.h"
 
 #include <QFileDialog>
+#include <QMenu>
 #include <QStandardItemModel>
 
 #define ERROR_DISPLAYING_TIMEOUT 2000

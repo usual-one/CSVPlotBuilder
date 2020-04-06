@@ -14,7 +14,7 @@ QPixmap createRect(int width, int height, QColor &color)
 }
 
 void clearPlot(QLabel *wdg_plot) {
-
+    wdg_plot->clear();
 }
 
 // QTableView, QStandartItemModel -----------------------------------------------------------------

@@ -7,15 +7,18 @@
 static QPair <axis_t, axis_t> getAxes(canvas_t &canvas, const plot_t &plot) {
     const QVector <double> points = {1, 2, 3, 4, 5, 6, 7, 8, 9};
 
+    QFont font = canvas.painter->font();
+    QFontMetrics font_metrics(font);
+    int font_height = font_metrics.height();
 
     axis_t x_axis = {};
 
     x_axis.name = plot.labels.first;
 
-    x_axis.canvas_line.p1.x = (margin_g + sign_height_g) * canvas.pixmap->width();
-    x_axis.canvas_line.p1.y = (1 - (margin_g + sign_height_g)) * canvas.pixmap->height();
-    x_axis.canvas_line.p2.x = (1 - margin_g) * canvas.pixmap->width();
-    x_axis.canvas_line.p2.y = (1 - (margin_g + sign_height_g)) * canvas.pixmap->height();
+    x_axis.canvas_line.p1.x = CANVAS_MARGIN + font_height * 2 + CANVAS_INNER_MARGIN * 2;
+    x_axis.canvas_line.p1.y = canvas.pixmap->height() - (CANVAS_MARGIN + font_height * 2 + CANVAS_INNER_MARGIN * 2);
+    x_axis.canvas_line.p2.x = canvas.pixmap->width() - CANVAS_MARGIN;
+    x_axis.canvas_line.p2.y = canvas.pixmap->height() - (CANVAS_MARGIN + font_height * 2 + CANVAS_INNER_MARGIN * 2);
 
     x_axis.plot_line.p1.x = plot.size.x_bottom;
     x_axis.plot_line.p1.y = plot.size.y_bottom;
@@ -45,10 +48,10 @@ static QPair <axis_t, axis_t> getAxes(canvas_t &canvas, const plot_t &plot) {
 
     y_axis.name = plot.labels.second;
 
-    y_axis.canvas_line.p1.x = (margin_g + sign_height_g) * canvas.pixmap->width();
-    y_axis.canvas_line.p1.y = (1 - (margin_g + sign_height_g)) * canvas.pixmap->height();
-    y_axis.canvas_line.p2.x = (margin_g + sign_height_g) * canvas.pixmap->width();
-    y_axis.canvas_line.p2.y = margin_g * canvas.pixmap->height();
+    y_axis.canvas_line.p1.x = CANVAS_MARGIN + font_height * 2 + CANVAS_INNER_MARGIN * 2;
+    y_axis.canvas_line.p1.y = canvas.pixmap->height() - (CANVAS_MARGIN + font_height * 2 + CANVAS_INNER_MARGIN * 2);
+    y_axis.canvas_line.p2.x = CANVAS_MARGIN + font_height * 2 + CANVAS_INNER_MARGIN * 2;
+    y_axis.canvas_line.p2.y = CANVAS_MARGIN;
 
     y_axis.plot_line.p1.x = plot.size.x_bottom;
     y_axis.plot_line.p1.y = plot.size.y_bottom;
@@ -86,47 +89,47 @@ static void drawRotatedText(canvas_t &canvas, const point_t &point, const QStrin
 }
 
 static void drawAxes(canvas_t &canvas, const QPair <axis_t, axis_t> &axes) {
-    const QColor axes_color = Qt::black;
-    const QColor grid_color = Qt::lightGray;
-
     QFont font = canvas.painter->font();
     QFontMetrics font_metrics(font);
 
-    canvas.painter->setPen(axes_color);
 
-    canvas.painter->drawLine(axes.first.canvas_line.p1.x, axes.first.canvas_line.p1.y, axes.first.canvas_line.p2.x, axes.first.canvas_line.p2.y);
-    canvas.painter->drawLine(axes.second.canvas_line.p1.x, axes.second.canvas_line.p1.y, axes.second.canvas_line.p2.x, axes.second.canvas_line.p2.y);
+    canvas.painter->setPen(AXES_COLOR);
+
+    canvas.painter->drawLine(axes.first.canvas_line.p1.x, axes.first.canvas_line.p1.y,
+                             axes.first.canvas_line.p2.x, axes.first.canvas_line.p2.y);
+    canvas.painter->drawLine(axes.second.canvas_line.p1.x, axes.second.canvas_line.p1.y,
+                             axes.second.canvas_line.p2.x, axes.second.canvas_line.p2.y);
 
     for (int i = 0; i < axes.first.canvas_points.size(); i++) {
         auto point = axes.first.canvas_points[i];
-        canvas.painter->setPen(grid_color);
+        canvas.painter->setPen(GRID_COLOR);
         canvas.painter->drawLine(QLine(QPoint(point.x, point.y),
                                        QPoint(point.x, axes.second.canvas_line.p2.y)));
-        canvas.painter->setPen(axes_color);
+        canvas.painter->setPen(AXES_COLOR);
         canvas.painter->drawLine(QLine(QPoint(point.x, point.y),
-                                       QPoint(point.x, point.y - (margin_g / 2) * canvas.pixmap->height())));
+                                       QPoint(point.x, point.y - DASH_LENGTH)));
         label_t point_label;
         point_label.text = QString::number(axes.first.plot_points[i].x);
         point_label.size = {(double) font_metrics.horizontalAdvance(point_label.text),
                             (double) font_metrics.height()};
         point_label.pos = {point.x - point_label.size.width / 2,
-                           point.y + 1.1 * point_label.size.height};
+                           point.y + point_label.size.height + CANVAS_INNER_MARGIN};
         canvas.painter->drawText(point_label.pos.x, point_label.pos.y, point_label.text);
     }
 
     for (int i = 0; i < axes.second.canvas_points.size(); i++) {
         auto point = axes.second.canvas_points[i];
-        canvas.painter->setPen(grid_color);
+        canvas.painter->setPen(GRID_COLOR);
         canvas.painter->drawLine(QLine(QPoint(point.x, point.y),
                                        QPoint(axes.first.canvas_line.p2.x, point.y)));
-        canvas.painter->setPen(axes_color);
+        canvas.painter->setPen(AXES_COLOR);
         canvas.painter->drawLine(QLine(QPoint(point.x, point.y),
-                                       QPoint(point.x + (margin_g / 2) * canvas.pixmap->width(), point.y)));
+                                       QPoint(point.x + DASH_LENGTH, point.y)));
         label_t point_label;
         point_label.text = QString::number(axes.second.plot_points[i].y);
         point_label.size = {(double) font_metrics.horizontalAdvance(point_label.text),
                             (double) font_metrics.height()};
-        point_label.pos = {point.x - 0.1 * point_label.size.height,
+        point_label.pos = {point.x - CANVAS_INNER_MARGIN,
                            point.y + point_label.size.width / 2};
         drawRotatedText(canvas, point_label.pos, point_label.text, -90);
     }
@@ -136,14 +139,14 @@ static void drawAxes(canvas_t &canvas, const QPair <axis_t, axis_t> &axes) {
     x_label.size = {(double) font_metrics.horizontalAdvance(x_label.text),
                     (double) font_metrics.height()};
     x_label.pos = {axes.first.canvas_line.p1.x + ((axes.first.canvas_line.p2.x - axes.first.canvas_line.p1.x) / 2) - x_label.size.width / 2,
-                   axes.first.canvas_line.p1.y + 2.6 * x_label.size.height};
+                   axes.first.canvas_line.p1.y + 2 * (x_label.size.height + CANVAS_INNER_MARGIN)};
     canvas.painter->drawText(x_label.pos.x, x_label.pos.y, x_label.text);
 
     label_t y_label;
     y_label.text = axes.second.name;
     y_label.size = {(double) font_metrics.horizontalAdvance(y_label.text),
                    (double) font_metrics.height()};
-    y_label.pos = {axes.second.canvas_line.p1.x - 1.6 * y_label.size.height,
+    y_label.pos = {axes.second.canvas_line.p1.x - 2 * CANVAS_INNER_MARGIN - y_label.size.height,
                   axes.second.canvas_line.p1.y - ((axes.second.canvas_line.p1.y - axes.second.canvas_line.p2.y) / 2) + y_label.size.width / 2};
     drawRotatedText(canvas, y_label.pos, y_label.text, -90);
 }
@@ -170,28 +173,38 @@ static graph_t getGraph(const graph_t &graph, const QPair <axis_t, axis_t> &axes
 }
 
 static void drawGraph(canvas_t &canvas, const graph_t &graph) {
-    double dot_size = 6;
-    double critical_dot_size = dot_size * 1.5;
+    const double critical_dot_size = DOT_DIAMETR * DOT_CRITICAL_RATIO;
+    const int pie_circle_angle = 5760;
 
     canvas.painter->setPen(graph.color);
     canvas.painter->setBrush(QBrush(graph.color));
+
     for (int i = 0; i < graph.x_values.size() - 1; i++) {
-        canvas.painter->drawPie(graph.x_values[i] - dot_size / 2, graph.y_values[i] - dot_size / 2, dot_size, dot_size, 5760, 5760);
-        canvas.painter->drawLine(graph.x_values[i], graph.y_values[i], graph.x_values[i + 1], graph.y_values[i + 1]);
+        canvas.painter->drawPie(graph.x_values[i] - DOT_DIAMETR / 2,
+                                graph.y_values[i] - DOT_DIAMETR / 2,
+                                DOT_DIAMETR, DOT_DIAMETR,
+                                pie_circle_angle, pie_circle_angle);
+        canvas.painter->drawLine(graph.x_values[i], graph.y_values[i],
+                                 graph.x_values[i + 1], graph.y_values[i + 1]);
     }
-    canvas.painter->drawPie(graph.x_values[graph.x_values.size() - 1] - dot_size / 2, graph.y_values[graph.x_values.size() - 1] - dot_size / 2, dot_size, dot_size, 5760, 5760);
+    canvas.painter->drawPie(graph.x_values[graph.x_values.size() - 1] - DOT_DIAMETR / 2,
+                            graph.y_values[graph.x_values.size() - 1] - DOT_DIAMETR / 2,
+                            DOT_DIAMETR, DOT_DIAMETR,
+                            pie_circle_angle, pie_circle_angle);
 
     for (int i = 0; i < graph.critical_x_values.size(); i++) {
-        canvas.painter->drawPie(graph.critical_x_values[i] - critical_dot_size / 2, graph.critical_y_values[i] - critical_dot_size / 2, critical_dot_size, critical_dot_size, 5760, 5760);
+        canvas.painter->drawPie(graph.critical_x_values[i] - critical_dot_size / 2,
+                                graph.critical_y_values[i] - critical_dot_size / 2,
+                                critical_dot_size, critical_dot_size,
+                                pie_circle_angle, pie_circle_angle);
     }
 }
 
 static void drawPlot(canvas_t &canvas, const plot_t &plot) {
-    const QColor canvas_color = Qt::white;
-    const QFont canvas_font("ubuntu", 11);
+    const QFont canvas_font(CANVAS_FONT_FAMILY, CANVAS_FONT_SIZE);
 
     canvas.painter->setFont(canvas_font);
-    canvas.painter->fillRect(0, 0, canvas.pixmap->width(), canvas.pixmap->height(), canvas_color);
+    canvas.painter->fillRect(0, 0, canvas.pixmap->width(), canvas.pixmap->height(), CANVAS_COLOR);
 
     auto axes = getAxes(canvas, plot);
     drawAxes(canvas, axes);

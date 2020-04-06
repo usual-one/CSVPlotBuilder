@@ -3,10 +3,7 @@
 
 #include <QPixmap>
 
-// Percentage of canvas size ------
-const double margin_g = 0.05;
-const double sign_height_g = 0.1;
-// --------------------------------
+// drawing types --------------------------------
 
 typedef struct {
     double x;
@@ -22,6 +19,8 @@ typedef struct {
     double width;
     double height;
 } rect_t;
+
+// plotting types -------------------------------
 
 typedef struct {
     double x_top;
@@ -40,17 +39,6 @@ typedef struct {
 } graph_t;
 
 typedef struct {
-    QVector <graph_t> graphs;
-    graph_size_t size;
-    QPair <QString, QString> labels;
-} plot_t;
-
-typedef struct {
-    QPixmap *pixmap;
-    QPainter *painter;
-} canvas_t;
-
-typedef struct {
     QString text;
     rect_t size;
     point_t pos;
@@ -66,5 +54,16 @@ typedef struct {
     double factor;
     // canvas_distance = factor * plot_distance
 } axis_t;
+
+typedef struct {
+    QVector <graph_t> graphs;
+    graph_size_t size;
+    QPair <QString, QString> labels;
+} plot_t;
+
+typedef struct {
+    QPixmap *pixmap;
+    QPainter *painter;
+} canvas_t;
 
 #endif // PLOTTING_TYPES_H
