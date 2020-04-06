@@ -3,6 +3,7 @@
 #include "include/logics/logics.h"
 #include "include/logics/logics_utils.h"
 #include "include/UI/UI_utils.h"
+#include "include/UI/plotting/plotting.h"
 
 #include <QFileDialog>
 #include <QStandardItemModel>
@@ -187,39 +188,21 @@ void MainWindow::showMetrics(res_t loaded_data) {
     ui->tbl_res->setModel(model);
 }
 
-void MainWindow::showPlot(res_t loaded_data)
-{
+void MainWindow::showPlot(res_t loaded_data) {
     clearPlot(ui->wdg_plot);
-    const QString xAxisLabel = "year";
-    ui->wdg_plot->xAxis->setLabel(xAxisLabel);
-    ui->wdg_plot->yAxis->setLabel(QString::fromStdString(loaded_data.col_name));
-    for (size_t i = 0; i < loaded_data.col_values.size(); i++) {
-        ui->wdg_plot->addGraph();
-        QVector <double> years = QVector<double>(loaded_data.col_values[i].years.begin(), loaded_data.col_values[i].years.end());
-        QVector <double> column = QVector<double>(loaded_data.col_values[i].values.begin(), loaded_data.col_values[i].values.end());
-        ui->wdg_plot->graph(i * 2)->setData(years, column);
-        ui->wdg_plot->graph(i * 2)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 4));
-        ui->wdg_plot->graph(i * 2)->setPen(QPen(used_colors[i]));
-        if (!i) {
-            ui->wdg_plot->graph(i * 2)->rescaleAxes();
-        } else {
-            ui->wdg_plot->graph(i * 2)->rescaleAxes(true);
-        }
+    const QString x_axis_label = "year";
+    const QString y_axis_label = QString::fromStdString(loaded_data.col_name);
+    const double plot_margin = 0.1;
 
-        double max_range = ui->wdg_plot->yAxis->range().upper;
-        double min_range = ui->wdg_plot->yAxis->range().lower;
-        if (min_range > loaded_data.metrics[i].metrics[0] - 0.1 * abs(loaded_data.metrics[i].metrics[0])) {
-            min_range = loaded_data.metrics[i].metrics[0] - 0.1 * abs(loaded_data.metrics[i].metrics[0]);
-            ui->wdg_plot->yAxis->setRange(min_range, max_range);
-        }
-        if (max_range < loaded_data.metrics[i].metrics[1] + 0.1 * abs(loaded_data.metrics[i].metrics[1])) {
-            max_range = loaded_data.metrics[i].metrics[1] + 0.1 * abs(loaded_data.metrics[i].metrics[1]);
-            ui->wdg_plot->yAxis->setRange(min_range, max_range);
-        }
+    plot_t plot;
+    for (size_t i = 0; i < loaded_data.col_values.size(); i++) {
+        graph_t graph;
+
+        graph.x_values = stdvectorToQvector(loaded_data.col_values[i].years);
+        graph.y_values = stdvectorToQvector(loaded_data.col_values[i].values);
 
         QVector <double> metrics_years = {};
         QVector <double> metrics_values = {};
-        ui->wdg_plot->addGraph();
         for (auto metric_years : loaded_data.metrics[i].years) {
             for (auto year : metric_years) {
                 metrics_years.push_back(year);
@@ -230,16 +213,26 @@ void MainWindow::showPlot(res_t loaded_data)
                 metrics_values.push_back(loaded_data.metrics[i].metrics[metric_index]);
             }
         }
-        ui->wdg_plot->graph(i * 2 + 1)->setData(metrics_years, metrics_values);
-        ui->wdg_plot->graph(i * 2 + 1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 6));
-        ui->wdg_plot->graph(i * 2 + 1)->setLineStyle(QCPGraph::lsNone);
-        ui->wdg_plot->graph(i * 2 + 1)->setPen(QPen(used_colors[i]));
+        graph.critical_x_values = metrics_years;
+        graph.critical_y_values = metrics_values;
+
+        graph.size.x_top = getMaximum(qvectorToStdvector(graph.x_values));
+        graph.size.x_bottom = getMinimum(qvectorToStdvector(graph.x_values));
+        graph.size.y_top = getMaximum(qvectorToStdvector(graph.y_values));
+        graph.size.y_bottom = getMinimum(qvectorToStdvector(graph.y_values));
+
+        graph.color = used_colors[i];
+
+        plot.graphs.push_back(graph);
     }
-    ui->wdg_plot->replot();
+    plot.size = countPlotSize(plot.graphs, plot_margin);
+    plot.labels = {x_axis_label, y_axis_label};
+
+    canvas_t canvas = createCanvas(ui->wdg_plot->size(), plot);
+    ui->wdg_plot->setPixmap(*canvas.pixmap);
 }
 
-void MainWindow::addRegion()
-{
+void MainWindow::addRegion() {
     const int color_count = 14;
     QString region = ui->ln_add_region->text();
     ui->ln_add_region->clear();

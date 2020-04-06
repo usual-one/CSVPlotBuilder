@@ -3,6 +3,8 @@
 
 #include "lib/qcustomplot.h"
 
+#include <vector>
+
 #include <QPixmap>
 #include <QColor>
 #include <QTableView>
@@ -12,6 +14,8 @@
 // QPixmap ----------------------------------------------------------------------------------------
 
 QPixmap createRect(int width, int height, QColor &color);
+
+void clearPlot(QLabel *wdg_plot);
 
 // QTableView, QStandartItemModel -----------------------------------------------------------------
 
@@ -23,8 +27,18 @@ void setBoldFont(QStandardItem *item);
 
 QList <QString> getAllListItemsText(QListWidget *list_widget);
 
-// QCustomPlot ------------------------------------------------------------------------------------
+// QVector ----------------------------------------------------------------------------------------
 
-void clearPlot(QCustomPlot *plot_widget);
+template <typename T>
+QVector <T> stdvectorToQvector(const std::vector <T> &vec) {
+    return QVector <T> (vec.begin(), vec.end());
+}
+
+template <typename T>
+std::vector <T> qvectorToStdvector(const QVector <T> &qvec) {
+    return std::vector <T> (qvec.begin(), qvec.end());
+}
+
+// ------------------------------------------------------------------------------------------------
 
 #endif // UI_UTILS_H

@@ -20,11 +20,14 @@ SOURCES += \
     main.cpp \
     src/UI/UI_utils.cpp \
     src/UI/mainwindow.cpp \
+    src/UI/plotting.cpp \
     src/logics/logics.cpp \
     src/logics/logics_utils.cpp
 
 HEADERS += \
     include/UI/UI_utils.h \
+    include/UI/plotting/plotting.h \
+    include/UI/plotting/plotting_types.h \
     include/logics/logics.h \
     include/UI/mainwindow.h \
     include/logics/logics_utils.h \

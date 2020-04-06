@@ -14,6 +14,10 @@ std::vector <std::string> splitStr(const std::string &str, const std::string &se
 
 int generateRandInt(int lowest, int highest);
 
+// double -----------------------------------------------------------------------------------------
+
+int getOrder(double magnitude);
+
 // std::vector ------------------------------------------------------------------------------------
 
 template <typename T>

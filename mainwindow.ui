@@ -44,7 +44,7 @@
    <property name="styleSheet">
     <string notr="true"/>
    </property>
-   <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,1,2">
+   <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,1,2">
     <property name="spacing">
      <number>5</number>
     </property>
@@ -522,12 +522,14 @@
        </layout>
       </item>
       <item>
-       <widget class="QCustomPlot" name="wdg_plot" native="true">
+       <widget class="QLabel" name="wdg_plot">
         <property name="font">
          <font>
-          <family>Ubuntu</family>
           <pointsize>10</pointsize>
          </font>
+        </property>
+        <property name="text">
+         <string/>
         </property>
        </widget>
       </item>
@@ -544,14 +546,6 @@
    </property>
   </widget>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>QCustomPlot</class>
-   <extends>QWidget</extends>
-   <header>lib/qcustomplot.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

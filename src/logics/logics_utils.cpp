@@ -1,5 +1,6 @@
 #include "include/logics/logics_utils.h"
 
+#include <cmath>
 #include <ctime>
 
 // std::string ------------------------------------------------------------------------------------
@@ -40,6 +41,26 @@ int generateRandInt(int lowest, int highest)
     }
     srand(time(nullptr));
     return rand() % highest + lowest;
+}
+
+// double -----------------------------------------------------------------------------------------
+
+int getOrder(double magnitude) {
+    int order = 0;
+
+    if (fabs(magnitude) >= 1) {
+        while (magnitude >= 1) {
+            magnitude /= 10;
+            order++;
+        }
+    } else {
+        while (fabs(magnitude) <= 1) {
+            magnitude *= 10;
+            order--;
+        }
+    }
+
+    return order;
 }
 
 // ------------------------------------------------------------------------------------------------
