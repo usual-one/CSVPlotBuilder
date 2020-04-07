@@ -5,8 +5,8 @@
 #include <utility>
 #include <algorithm>
 
-vector <string> HEADERS = {};
-vector <vector<string>> FIELDS = {};
+vector <string> g_headers = {};
+vector <vector<string>> g_fields = {};
 
 static int nameToInt(const vector <string> &names, const string &name) {
     int column_index = -1;
@@ -30,16 +30,16 @@ res_t exec_op(op_args args) {
             results.error_type = csv.first;
             return results;
         }
-        HEADERS = results.headers = csv.second.first;
-        FIELDS = results.arr = csv.second.second;
+        g_headers = results.headers = csv.second.first;
+        g_fields = results.arr = csv.second.second;
     } else if (args.operation_type == CALCULATE_METRICS) {
         auto regions_data_response = getRegionsData(args.path, args.regions, args.years);
         if (regions_data_response.first) {
             results.error_type = regions_data_response.first;
             return results;
         }
-        FIELDS.clear();
-        FIELDS = regions_data_response.second;
+        g_fields.clear();
+        g_fields = regions_data_response.second;
 
         auto col_values_response = getColValues(args.regions, args.column);
         if (col_values_response.first) {
@@ -48,7 +48,7 @@ res_t exec_op(op_args args) {
         }
         results.col_values = col_values_response.second;
 
-        results.col_name = HEADERS[nameToInt(HEADERS, args.column)];
+        results.col_name = g_headers[nameToInt(g_headers, args.column)];
 
         results.metrics = calculateAllMetrics(results.col_values);
     } else {
@@ -177,7 +177,7 @@ vector <metric_values_t> calculateAllMetrics(const vector <column_values_t> &reg
 pair <err_t, vector <column_values_t>> getColValues(const vector <string> &regions, const string &column) {
     const vector <int> column_borders = {2, 6};
 
-    int column_index = nameToInt(HEADERS, column);
+    int column_index = nameToInt(g_headers, column);
 
     if (!(column_borders[0] <= column_index && column_index <= column_borders[1])) {
         return {WRONG_COLUMN_NAME, {}};
@@ -188,7 +188,7 @@ pair <err_t, vector <column_values_t>> getColValues(const vector <string> &regio
         all_col_values.push_back({});
     }
 
-    for (auto record : FIELDS) {
+    for (auto record : g_fields) {
         int region_index = distance(regions.begin(), find(regions.begin(), regions.end(), record[1]));
         if (!record[0].size() || !record[column_index].size()) {
             continue;
