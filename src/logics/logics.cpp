@@ -8,66 +8,6 @@
 vector <string> g_headers = {};
 vector <vector<string>> g_fields = {};
 
-static int nameToInt(const vector <string> &names, const string &name) {
-    int column_index = -1;
-    if (isNumber(name)) {
-        column_index = stoi(name) - 1;
-    } else {
-        auto it = find(names.begin(), names.end(), name);
-        if (it == names.end()) {
-            return -1;
-        }
-        column_index = distance(names.begin(), it);
-    }
-    return column_index;
-}
-
-res_t exec_op(op_args args) {
-    res_t results = {};
-    if (args.operation_type == LOAD_DATA) {
-        auto csv = readCSV(args.path, args.regions[0], args.years);
-        if (csv.first) {
-            results.error_type = csv.first;
-            return results;
-        }
-        g_headers = results.headers = csv.second.first;
-        g_fields = results.arr = csv.second.second;
-    } else if (args.operation_type == CALCULATE_METRICS) {
-        auto regions_data_response = getRegionsData(args.path, args.regions, args.years);
-        if (regions_data_response.first) {
-            results.error_type = regions_data_response.first;
-            return results;
-        }
-        g_fields.clear();
-        g_fields = regions_data_response.second;
-
-        auto col_values_response = getColValues(args.regions, args.column);
-        if (col_values_response.first) {
-            results.error_type = col_values_response.first;
-            return results;
-        }
-        results.col_values = col_values_response.second;
-
-        results.col_name = g_headers[nameToInt(g_headers, args.column)];
-
-        results.metrics = calculateAllMetrics(results.col_values);
-    } else {
-        results.error_type = BAD_CODE;
-    }
-    results.error_type = OK;
-    return results;
-}
-
-static bool isNumberBetweenPair(int number, pair<int, int> years) {
-    if (!years.first) {
-        return number <= years.second;
-    }
-    if (!years.second) {
-        return number >= years.first;
-    }
-    return years.first <= number && number <= years.second;
-}
-
 static err_t isValid(const vector <string> &record, const string &region, pair<int, int> years) {
     if (years.first != 0 || years.second != 0) {
         if (!record[0].size() || !isNumber(record[0])) {
@@ -88,7 +28,8 @@ static err_t isValid(const vector <string> &record, const string &region, pair<i
     return OK;
 }
 
-pair <err_t, pair <vector <string>, vector <vector <string>>>> readCSV(const string &path, const string &region, pair<int, int> years) {
+static pair <err_t, pair <vector <string>, vector <vector <string>>>>
+readCSV(const string &path, const string &region, pair<int, int> years) {
     ifstream fin(path);
     if (!fin.is_open()) {
         return {FILE_OPENING_ERROR, {{}, {}}};
@@ -113,7 +54,7 @@ pair <err_t, pair <vector <string>, vector <vector <string>>>> readCSV(const str
             records.push_back(record);
         }
     }
-        
+
     fin.close();
     if (!records.size()) {
         return {error, {{}, {}}};
@@ -121,7 +62,8 @@ pair <err_t, pair <vector <string>, vector <vector <string>>>> readCSV(const str
     return {OK, {headers, records}};
 }
 
-pair <err_t, vector <vector <string>>> getRegionsData(const string &path, const vector <string> &regions, pair<int, int> years) {
+static pair <err_t, vector <vector <string>>>
+getRegionsData(const string &path, const vector <string> &regions, pair<int, int> years) {
     vector <vector <string>> region_data= {};
     for (auto region : regions) {
         auto reading_res = readCSV(path, region, years);
@@ -133,8 +75,48 @@ pair <err_t, vector <vector <string>>> getRegionsData(const string &path, const 
     return {OK, region_data};
 }
 
-vector <metric_values_t> calculateAllMetrics(const vector <column_values_t> &region_values) {
+static int nameToInt(const vector <string> &names, const string &name) {
+    int column_index = -1;
+    if (isNumber(name)) {
+        column_index = stoi(name) - 1;
+    } else {
+        column_index = getIndex(names, name);
+    }
+    return column_index;
+}
 
+static pair <err_t, vector <column_values_t>> getColValues(const vector <string> &regions, const string &column) {
+    const vector <int> column_borders = {2, 6};
+
+    int column_index = nameToInt(g_headers, column);
+
+    if (!(column_borders[0] <= column_index && column_index <= column_borders[1])) {
+        return {WRONG_COLUMN_NAME, {}};
+    }
+
+    vector <column_values_t> all_col_values = {};
+    for (auto region : regions) {
+        all_col_values.push_back({});
+    }
+
+    for (auto record : g_fields) {
+        int region_index = distance(regions.begin(), find(regions.begin(), regions.end(), record[1]));
+        if (!record[0].size() || !record[column_index].size()) {
+            continue;
+        }
+        all_col_values[region_index].years.push_back(stod(record[0]));
+        all_col_values[region_index].values.push_back(stod(record[column_index]));
+    }
+
+    for (auto region : all_col_values) {
+        if (!region.years.size() || !region.values.size()) {
+            return {COLUMN_IS_EMPTY, {}};
+        }
+    }
+    return {OK, all_col_values};
+}
+
+static vector <metric_values_t> calculateAllMetrics(const vector <column_values_t> &region_values) {
     vector <metric_values_t> all_metrics = {};
     // all_metrics = [region1[metric_values], region2[metric_values], ...]
     for (auto region : region_values) {
@@ -174,50 +156,38 @@ vector <metric_values_t> calculateAllMetrics(const vector <column_values_t> &reg
     return all_metrics;
 }
 
-pair <err_t, vector <column_values_t>> getColValues(const vector <string> &regions, const string &column) {
-    const vector <int> column_borders = {2, 6};
-
-    int column_index = nameToInt(g_headers, column);
-
-    if (!(column_borders[0] <= column_index && column_index <= column_borders[1])) {
-        return {WRONG_COLUMN_NAME, {}};
-    }
-
-    vector <column_values_t> all_col_values = {};
-    for (auto region : regions) {
-        all_col_values.push_back({});
-    }
-
-    for (auto record : g_fields) {
-        int region_index = distance(regions.begin(), find(regions.begin(), regions.end(), record[1]));
-        if (!record[0].size() || !record[column_index].size()) {
-            continue;
+res_t exec_op(op_args args) {
+    res_t results = {};
+    if (args.operation_type == LOAD_DATA) {
+        auto csv = readCSV(args.path, args.regions[0], args.years);
+        if (csv.first) {
+            results.error_type = csv.first;
+            return results;
         }
-        all_col_values[region_index].years.push_back(stod(record[0]));
-        all_col_values[region_index].values.push_back(stod(record[column_index]));
-    }
-
-    for (auto region : all_col_values) {
-        if (!region.years.size() || !region.values.size()) {
-            return {COLUMN_IS_EMPTY, {}};
+        g_headers = results.headers = csv.second.first;
+        g_fields = results.arr = csv.second.second;
+    } else if (args.operation_type == CALCULATE_METRICS) {
+        auto regions_data_response = getRegionsData(args.path, args.regions, args.years);
+        if (regions_data_response.first) {
+            results.error_type = regions_data_response.first;
+            return results;
         }
+        g_fields.clear();
+        g_fields = regions_data_response.second;
+
+        auto col_values_response = getColValues(args.regions, args.column);
+        if (col_values_response.first) {
+            results.error_type = col_values_response.first;
+            return results;
+        }
+        results.col_values = col_values_response.second;
+
+        results.col_name = g_headers[nameToInt(g_headers, args.column)];
+
+        results.metrics = calculateAllMetrics(results.col_values);
+    } else {
+        results.error_type = BAD_CODE;
     }
-    return {OK, all_col_values};
-}
-
-double getMinimum(const vector <double> &arr) {
-    return *min_element(arr.begin(), arr.end());
-}
-
-double getMaximum(const vector <double> &arr) {
-    return *max_element(arr.begin(), arr.end());
-}
-
-double getMedian(const vector <double> &arr) {
-    vector <double> tmp_arr(arr);
-    sort(tmp_arr.begin(), tmp_arr.end());
-    if (tmp_arr.size() % 2 == 1) {
-        return tmp_arr[tmp_arr.size() / 2];
-    }
-    return (tmp_arr[tmp_arr.size() / 2] + tmp_arr[tmp_arr.size() / 2 - 1]) / 2;
+    results.error_type = OK;
+    return results;
 }

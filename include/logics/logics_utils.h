@@ -18,6 +18,20 @@ int generateRandInt(int lowest, int highest);
 
 int getOrder(double magnitude);
 
+// std::pair --------------------------------------------------------------------------------------
+
+template  <typename T>
+bool isNumberBetweenPair(T number, std::pair<T, T> years) {
+    // if one member of pair == 0, then compares only to second
+   if (!years.first) {
+       return number <= years.second;
+   }
+   if (!years.second) {
+       return number >= years.first;
+   }
+   return years.first <= number && number <= years.second;
+}
+
 // std::vector ------------------------------------------------------------------------------------
 
 template <typename T>
@@ -51,6 +65,26 @@ std::vector <int> findPlaces(const std::vector <T> &vect, T value) {
         }
     }
     return places;
+}
+
+template <typename T>
+T getMinimum(const std::vector <T> &vec) {
+    return *min_element(vec.begin(), vec.end());
+}
+
+template <typename T>
+T getMaximum(const std::vector <T> &vec) {
+    return *max_element(vec.begin(), vec.end());
+}
+
+template <typename T>
+T getMedian(const std::vector <T> &vec) {
+    std::vector <T> tmp_vec(vec);
+    sort(tmp_vec.begin(), tmp_vec.end());
+    if (tmp_vec.size() % 2 == 1) {
+        return tmp_vec[tmp_vec.size() / 2];
+    }
+    return (tmp_vec[tmp_vec.size() / 2] + tmp_vec[tmp_vec.size() / 2 - 1]) / 2;
 }
 
 // ------------------------------------------------------------------------------------------------

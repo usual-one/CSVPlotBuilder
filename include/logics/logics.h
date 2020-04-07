@@ -6,12 +6,6 @@
 
 using namespace std;
 
-enum metrics_t {
-    MIN,
-    MAX,
-    MEDIAN
-};
-
 enum op_t {
     LOAD_DATA,
     CALCULATE_METRICS
@@ -61,19 +55,5 @@ typedef struct {
 } res_t;
 
 res_t exec_op(op_args args);
-
-pair <err_t, pair <vector <string>, vector <vector <string>>>> readCSV(const string &path, const string &region, pair<int, int> years);
-
-pair <err_t, vector <vector <string>>> getRegionsData(const string &path, const vector <string> &regions, pair<int, int> years);
-
-pair <err_t, vector <column_values_t>> getColValues(const vector <string> &regions, const string &column);
-
-vector <metric_values_t> calculateAllMetrics(const vector <column_values_t> &region_values);
-
-double getMinimum(const vector<double> &arr);
-
-double getMaximum(const vector<double> &arr);
-
-double getMedian(const vector<double> &arr);
 
 #endif // LOGICS_H
