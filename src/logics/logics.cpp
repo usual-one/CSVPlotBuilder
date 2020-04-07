@@ -5,6 +5,9 @@
 #include <utility>
 #include <algorithm>
 
+const int FIRST_VALID_COLUMN_INDEX = 2;
+const int LAST_VALID_COLUMN_INDEX = 6;
+
 vector <string> g_headers = {};
 vector <vector<string>> g_fields = {};
 
@@ -86,11 +89,9 @@ static int nameToInt(const vector <string> &names, const string &name) {
 }
 
 static pair <err_t, vector <column_values_t>> getColValues(const vector <string> &regions, const string &column) {
-    const vector <int> column_borders = {2, 6};
-
     int column_index = nameToInt(g_headers, column);
 
-    if (!(column_borders[0] <= column_index && column_index <= column_borders[1])) {
+    if (!(FIRST_VALID_COLUMN_INDEX <= column_index && column_index <= LAST_VALID_COLUMN_INDEX)) {
         return {WRONG_COLUMN_NAME, {}};
     }
 
